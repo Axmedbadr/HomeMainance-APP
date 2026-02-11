@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -5,6 +6,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 const reviewsRoutes = require('./routes/reviews');
+const providerRoutes = require('./routes/providers');
 
 const app = express();
 
@@ -22,6 +24,11 @@ app.get('/api/test', (req, res) => {
   res.json({ message: "API WORKING " });
 });
 
+
+app.use('/uploads', express.static('uploads'));
+
+
+app.use('/api/providers', providerRoutes);
 
 app.use('/api/reviews', reviewsRoutes);
 
