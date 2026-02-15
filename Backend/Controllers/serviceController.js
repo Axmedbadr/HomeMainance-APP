@@ -1,63 +1,61 @@
-// 1. Haddii aad leedahay Model, halkan ku dhoobso (Import)
-// import Service from '../models/Service.js'; 
+import Service from '../models/Service.js';
 
-// 2. Soo saarista dhammaan adeegyada (Get All Services)
+// 1. Hel dhammaan adeegyada (Kani waa midka xogta u diraya Frontend-ka)
 export const getServices = async (req, res) => {
     try {
-        res.status(200).json({ 
-            success: true, 
-            message: "Liiska adeegyada si guul leh ayaa loo soo helay." 
-        });
+        const services = await Service.find();
+        res.status(200).json(services);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 3. Abuurista adeeg cusub (Create Service)
+// 2. Abuur adeeg cusub
 export const createService = async (req, res) => {
     try {
-        const { name, description, price } = req.body;
-        res.status(201).json({ 
-            success: true, 
-            message: "Adeegga waa la abuuray!",
-            data: { name, description, price }
-        });
+        const newService = await Service.create(req.body);
+        res.status(201).json(newService);
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
-// 4. Helidda hal adeeg (Get Single Service)
+// 3. Hel hal adeeg
 export const getServiceById = async (req, res) => {
     try {
-        res.status(200).json({ success: true, id: req.params.id });
+        const service = await Service.findById(req.params.id);
+        if (!service) return res.status(404).json({ message: "Adeegga lama helin" });
+        res.status(200).json(service);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 5. Wax ka beddelka adeeg (Update Service)
+// 4. Wax ka beddelka adeegga
 export const updateService = async (req, res) => {
     try {
-        res.status(200).json({ success: true, message: "Adeegga waa la cusboonaysiiyay" });
+        const updatedService = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.status(200).json(updatedService);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 6. Tiridda adeeg (Delete Service)
+// 5. Tiridda adeegga
 export const deleteService = async (req, res) => {
     try {
+        await Service.findByIdAndDelete(req.params.id);
         res.status(200).json({ success: true, message: "Adeegga waa la tirtiray" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 7. Adeegyada provider gaar ah (Get Services by Provider)
+// 6. Adeegyada uu leeyahay hal provider (Kani wuxuu xallinayaa qaladkii u dambeeyay)
 export const getServicesByProvider = async (req, res) => {
     try {
-        res.status(200).json({ success: true, providerId: req.params.providerId });
+        const services = await Service.find({ provider: req.params.providerId });
+        res.status(200).json(services);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

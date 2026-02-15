@@ -1,31 +1,20 @@
-const express = require('express');
+import express from 'express';
+import { 
+    getProviders, 
+    getProviderById, 
+    registerProvider, 
+    updateProvider, 
+    updateStatus 
+} from '../Controllers/providers.js'; // Hubi in magaca faylku sax yahay
+
 const router = express.Router();
-const upload = require('../Middleware/upload-simple'); 
-const controller = require('../Controllers/providers');
 
+// KAN AYAA MUHIIM AH: Marka hore Register dhig
+router.post('/register', registerProvider); 
 
-router.post(
-  '/register',
-  upload.fields([
-    { name: 'profileImage', maxCount: 1 },
-    { name: 'documents', maxCount: 5 }
-  ]),
-  controller.registerProvider
-);
+router.get('/', getProviders);
+router.get('/:id', getProviderById);
+router.put('/:id', updateProvider);
+router.put('/:id/status', updateStatus);
 
-
-router.get('/', controller.getProviders);
-
-
-router.get('/:id', controller.getProviderById);
-
-
-router.put('/profile/:id', controller.updateProfile);
-
-
-router.put('/:id/availability', controller.updateAvailability);
-
-
-router.put('/:id/status', controller.updateStatus);
-
-module.exports = router;
+export default router;

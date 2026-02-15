@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"; // Beddel 'require' una beddel 'import'
 
 const ServiceProviderSchema = new mongoose.Schema(
   {
@@ -21,4 +21,6 @@ const ServiceProviderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ServiceProvider", ServiceProviderSchema);
+// Beddel 'module.exports' una beddel 'export default'
+const ServiceProvider = mongoose.model("ServiceProvider", ServiceProviderSchema);
+export default ServiceProvider;

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const serviceSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -7,4 +7,5 @@ const serviceSchema = new mongoose.Schema({
   description: String
 }, { timestamps: true });
 
-module.exports = mongoose.model('Service', serviceSchema);
+// Waxaan u beddelnay 'export default' si uu 'import' ugu shaqeeyo
+export default mongoose.model('Service', serviceSchema);
