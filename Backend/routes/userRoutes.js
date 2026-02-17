@@ -1,52 +1,56 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import User from '../models/User.js';
+import { User, Provider } from '../models/models.js';
+import { protect } from '../Middleware/auth.js';
 
 const router = express.Router();
 
-// 1. GET ME (Si loo hubiyo qofka soo galay)
-router.get('/me', async (req, res) => {
+// 1. DIIWAANGELINTA (Kani waa kan xallinaya 404 Error)
+router.post('/register', async (req, res) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) return res.status(401).json({ message: "No token" });
+        const { name, email, password, phone, role } = req.body;
+        const userExists = await User.findOne({ email });
+        
+        if (userExists) return res.status(400).json({ success: false, message: "Email-kan hore ayaa loo isticmaalay" });
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id).select('-password');
-        res.json(user);
-    } catch (error) {
-        res.status(401).json({ message: "Not authorized" });
-    }
-});
+        const user = await User.create({ 
+            name, email, password, phone, 
+            role: role || 'customer' 
+        });
 
-// 2. LOGIN
-router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ success: false, message: "Email ama Password waa khalad" });
-        }
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
-        res.json({ success: true, token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+        res.status(201).json({ success: true, token, user: { id: user._id, name: user.name, role: user.role } });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// 3. REGISTER
-router.post('/register', async (req, res) => {
+// 2. PROVIDER APPLY (Codsiga Nasir/Nimco)
+router.post('/providers/apply', async (req, res) => {
     try {
-        const { name, email, password, phone, role } = req.body;
-        const userExists = await User.findOne({ email });
-        if (userExists) return res.status(400).json({ message: "Email-kan waa la isticmaalay" });
+        const { fullName, email, phone, serviceType, location, bio } = req.body;
+        const alreadyApplied = await Provider.findOne({ email });
+        if (alreadyApplied) return res.status(400).json({ message: "Codsi hore ayaa laga hayaa email-kan" });
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        const newUser = await User.create({ name, email, password: hashedPassword, phone, role: role || 'user' });
-        res.status(201).json({ success: true, message: "User created" });
+        await Provider.create({ fullName, email, phone, serviceType, location, bio, status: 'pending' });
+        res.status(201).json({ success: true, message: "Codsigaaga waa la helay!" });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// 3. LOGIN
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user || !(await user.matchPassword(password))) {
+            return res.status(401).json({ success: false, message: "Email ama Password khaldan" });
+        }
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
+        res.json({ success: true, token, user: { id: user._id, name: user.name, role: user.role } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 

@@ -1,26 +1,19 @@
-import mongoose from "mongoose"; // Beddel 'require' una beddel 'import'
+import mongoose from "mongoose";
 
-const ServiceProviderSchema = new mongoose.Schema(
-  {
+const ServiceProviderSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
     email: { type: String },
     serviceType: { type: String, required: true },
+    status: { 
+        type: String, 
+        enum: ["pending", "approved", "blocked"], 
+        default: "pending" 
+    }
+}, { timestamps: true });
 
-    profileImage: { type: String },
-    documents: [{ type: String }],
+// Kani waa saxitaanka kama dambaysta ah:
+// Wuxuu hubinayaa haddii model-ka "Provider" uu jiro, haddii kale ayuu abuurayaa.
+const ServiceProvider = mongoose.models.Provider || mongoose.model("Provider", ServiceProviderSchema);
 
-    availability: { type: Boolean, default: true },
-
-    status: {
-      type: String,
-      enum: ["pending", "approved", "blocked"],
-      default: "pending",
-    },
-  },
-  { timestamps: true }
-);
-
-// Beddel 'module.exports' una beddel 'export default'
-const ServiceProvider = mongoose.model("ServiceProvider", ServiceProviderSchema);
 export default ServiceProvider;

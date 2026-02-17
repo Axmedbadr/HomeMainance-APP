@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiTool, FiClock, FiShield, FiStar, FiChevronRight, FiCheck } from 'react-icons/fi';
+import { FiTool, FiClock, FiShield, FiStar, FiChevronRight } from 'react-icons/fi';
 import ServiceList from '../components/services/ServiceList';
 
 const Home = () => {
@@ -9,17 +9,12 @@ const Home = () => {
       
       {/* --- HERO SECTION --- */}
       <section className="relative p-4 md:p-8"> 
-        {/* Hareeraha (Margins) waa la xoojiyey si uu u noqdo "Card-style" layout */}
         <div className="relative overflow-hidden bg-[#0a192f] rounded-[2.5rem] md:rounded-[4rem] min-h-[85vh] flex items-center shadow-2xl">
-          
-          {/* Background Accents */}
           <div className="absolute top-0 right-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_top_right,_#1e3a8a,_transparent)]"></div>
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
 
           <div className="container mx-auto px-8 md:px-16 relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              
-              {/* Text Side */}
               <div className="space-y-8 py-12">
                 <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">
                   <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
@@ -47,7 +42,6 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Visual Side */}
               <div className="hidden lg:block relative">
                 <div className="bg-white/5 border border-white/10 p-4 rounded-[3rem] backdrop-blur-xl rotate-3 shadow-2xl">
                    <div className="bg-[#0f172a] rounded-[2.5rem] p-8 grid grid-cols-2 gap-4">
@@ -58,7 +52,6 @@ const Home = () => {
                    </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -94,14 +87,13 @@ const Home = () => {
             </Link>
           </div>
           
-          {/* Your Original ServiceList logic */}
           <div className="relative z-10">
-            <ServiceList limit={6} />
+            {/* Tallaabada 2aad: Waxaan halkan ku darnay isHome={true} */}
+            <ServiceList limit={6} isHome={true} />
           </div>
         </div>
       </section>
 
-      {/* --- FOOTER --- */}
       <footer className="py-12 text-center text-slate-400 text-[10px] uppercase tracking-[0.4em]">
         © 2026 Premium Home Maintenance • Quality Guaranteed
       </footer>

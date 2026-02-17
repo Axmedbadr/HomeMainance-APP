@@ -1,20 +1,29 @@
 import express from 'express';
 import { 
     getProviders, 
-    getProviderById, 
-    registerProvider, 
-    updateProvider, 
-    updateStatus 
-} from '../Controllers/providers.js'; // Hubi in magaca faylku sax yahay
+    getAdminStats, 
+    applyToBeProvider, 
+    updateProviderStatus,
+    getProviderById // HUBI: Inaan halkan ku soo darnay function-ka cusub
+} from '../Controllers/providerController.js';
 
 const router = express.Router();
 
-// KAN AYAA MUHIIM AH: Marka hore Register dhig
-router.post('/register', registerProvider); 
+// 1. Dashboard Stats
+router.get('/admin/stats', getAdminStats); 
 
-router.get('/', getProviders);
-router.get('/:id', getProviderById);
-router.put('/:id', updateProvider);
-router.put('/:id/status', updateStatus);
+// 2. Helitaanka dhammaan Providers (Approved kuwa ah)
+router.get('/', getProviders); 
+
+// --- KANI WAA JIDKA XALLINAYA 404 ERROR-KA ---
+// 3. Helitaanka hal bixiye oo gaar ah (Profile Page)
+// Marka Nimco ay taabato "View Profile" kani ayaa la wacaa
+router.get('/:id', getProviderById); 
+
+// 4. Codsiga cusub (Apply Page)
+router.post('/apply', applyToBeProvider); 
+
+// 5. Ansixinta (Update Status)
+router.patch('/:id/status', updateProviderStatus); 
 
 export default router;

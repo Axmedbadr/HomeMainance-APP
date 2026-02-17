@@ -7,10 +7,9 @@ const Footer = () => {
     
       <div className="max-w-6xl mx-auto px-10 md:px-16">
         
-     
         <div className="flex flex-col md:flex-row justify-between items-center gap-10">
           
-      
+          {/* Logo Section */}
           <div className="flex items-center space-x-3">
             <div className="bg-blue-600 text-white p-1.5 rounded-lg shadow-lg shadow-blue-600/20">
               <FiActivity size={16} />
@@ -20,14 +19,12 @@ const Footer = () => {
             </span>
           </div>
 
-         
+          {/* Center Navigation - Waxaan u reebnay Services kaliya */}
           <nav className="flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.15em]">
             <a href="/services" className="text-white/90 hover:text-blue-500 transition-colors">Services</a>
-            <a href="/faq" className="text-white/90 hover:text-blue-500 transition-colors">Help</a>
-            <a href="/privacy" className="text-white/90 hover:text-blue-500 transition-colors">Privacy</a>
           </nav>
 
-         
+          {/* Contact & Socials */}
           <div className="flex items-center gap-10">
             <div className="hidden lg:flex items-center gap-6 text-[11px] font-medium text-white/80">
               <span className="flex items-center gap-2">
@@ -37,6 +34,7 @@ const Footer = () => {
                 <FiPhone className="text-blue-500"/> +252 63 4666778
               </span>
             </div>
+            
             <div className="flex gap-3">
               {[FiFacebook, FiTwitter, FiInstagram].map((Icon, i) => (
                 <a key={i} href="#" className="p-2.5 bg-white/5 text-white/70 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300">
@@ -47,14 +45,11 @@ const Footer = () => {
           </div>
         </div>
 
-      
-        <div className="mt-12 pt-6 border-t border-white/[0.05] flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+        {/* Bottom Bar - Kaliya Copyright-ka ayaa ku haray */}
+        <div className="mt-12 pt-6 border-t border-white/[0.05] flex justify-center items-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
           <p>© {new Date().getFullYear()} PROHUB GLOBAL</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Security</a>
-            <a href="#" className="hover:text-white transition-colors">Cookies</a>
-          </div>
         </div>
+
       </div>
     </footer>
   )

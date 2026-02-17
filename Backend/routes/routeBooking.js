@@ -1,22 +1,31 @@
 import express from 'express';
 import { 
-    createBooking, 
     getMyBookings, 
-    updateBookingStatus 
-} from '../Controllers/controllerBooking.js'; 
-
-import { protect } from '../middleware/auth.js';
+    createBooking, 
+    getAllBookings // Waxaan ku darnay tan si Admin-ku u arko ballamaha oo dhan
+} from '../Controllers/controllerBooking.js';
+import { protect, admin } from '../Middleware/auth.js'; 
 
 const router = express.Router();
 
-// 1. Abuurista Booking (Waa sax)
+/**
+ * 1. Abuurista Ballan Cusub
+ * Jidka: POST /api/bookings/
+ * Kani waa kan xallinaya 500 Error-ka
+ */
 router.post('/', protect, createBooking);
 
-// 2. HELITAANKA BALLAMAHA (Sax halkan si 404 u baxo)
-// Waxaan ka dhignay '/my-bookings' si uu ula mid noqdo waxa bookingService raadinayo
+/**
+ * 2. Helitaanka ballamaha qofka login-ka ah (sida Nimco)
+ * Jidka: GET /api/bookings/my-bookings
+ */
 router.get('/my-bookings', protect, getMyBookings);
 
-// 3. Cusboonaysiinta (Waa sax)
-router.patch('/:id', protect, updateBookingStatus);
+/**
+ * 3. Maamulka Ballamaha (Admin View)
+ * Jidka: GET /api/bookings/all
+ * Kani waa kan soo saaraya xogta ID-ga (6992dd...) iyo qiimaha ($ 25)
+ */
+router.get('/all', protect, admin, getAllBookings);
 
 export default router;

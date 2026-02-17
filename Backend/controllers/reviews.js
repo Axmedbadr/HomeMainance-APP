@@ -1,14 +1,16 @@
-import { Review } from '../models/models.js'; // Hubi in magaca file-ka model-kaagu sax yahay
+import { Review } from '../models/models.js';
 
-// 1. CREATE REVIEW
+// 1. CREATE REVIEW (Marka macmiilku faallo qorayo)
 export const createReview = async (req, res) => {
   try {
+    const { service, serviceProvider, rating, comment } = req.body;
+
     const review = await Review.create({
-      user: req.body.user,
-      service: req.body.service,
-      serviceProvider: req.body.serviceProvider,
-      rating: req.body.rating,
-      comment: req.body.comment
+      user: req.user._id, // Waxaan ka soo qaadeynaa protect middleware (Amni ahaan)
+      service,
+      serviceProvider,
+      rating,
+      comment
     });
 
     res.status(201).json({
@@ -26,7 +28,8 @@ export const createReview = async (req, res) => {
 // 2. GET REVIEWS BY SERVICE
 export const getReviewsByService = async (req, res, next) => {
   try {
-    const reviews = await Review.find({ service: req.params.serviceId });
+    const reviews = await Review.find({ service: req.params.serviceId })
+      .populate('user', 'name'); // Si loo arko qofka qoray magaciisa
     res.status(200).json({
       success: true,
       data: reviews
@@ -36,10 +39,11 @@ export const getReviewsByService = async (req, res, next) => {
   }
 };
 
-// 3. GET REVIEWS BY PROVIDER
+// 3. GET REVIEWS BY PROVIDER (Si Nasir loogu arko faallooyinka loo qoray)
 export const getReviewsByProvider = async (req, res, next) => {
   try {
-    const reviews = await Review.find({ serviceProvider: req.params.providerId });
+    const reviews = await Review.find({ serviceProvider: req.params.providerId })
+      .populate('user', 'name');
     res.status(200).json({
       success: true,
       data: reviews
