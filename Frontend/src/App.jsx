@@ -11,13 +11,14 @@ import Sidebar from './components/layout/Sidebar';
 import Home from './pages/Home';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
-import ForgotPassword from './components/auth/ForgotPassword'; // <--- HUBI INAAD KAN KU DARTAY
+
 import Dashboard from './pages/Dashboard';
 import ServicesPage from './pages/ServicesPage';
 import ProfilePage from './pages/ProfilePage';
 import ProviderList from './components/providers/ProviderList';
 import ProviderProfile from './components/providers/ProviderProfile';
 import BookingsPage from './pages/BookingsPage'; 
+import MyBookings from './pages/MyBookings'; // 1. WAA LAGU SOO DARAY
 import BookingForm from './components/bookings/BookingForm';
 
 // Admin Pages
@@ -55,7 +56,6 @@ function App() {
       <Header onMenuClick={() => setSidebarOpen(true)} />
 
       <div className="flex flex-1 relative overflow-x-hidden">
-        {/* Sidebar-ku wuxuu u muuqanayaa kaliya qofka soo galay (Logged In) */}
         {isAuthenticated && (
           <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
         )}
@@ -67,7 +67,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} /> {/* <--- HADDA WUU SHAQAYNAYAA */}
+
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/providers" element={<ProviderList />} />
               <Route path="/provider-profile/:id" element={<ProviderProfile />} />
@@ -81,9 +81,10 @@ function App() {
                 element={<ProtectedRoute><BookingForm /></ProtectedRoute>} 
               />
 
+              {/* 2. JIDKA CUSUB EE MACMIILKA (Si looga fogaado Error 403) */}
               <Route 
-                path="/bookings" 
-                element={<ProtectedRoute><BookingsPage isAdminView={false} /></ProtectedRoute>} 
+                path="/my-bookings" 
+                element={<ProtectedRoute><MyBookings /></ProtectedRoute>} 
               />
 
               {/* --- ADMIN ONLY ROUTES --- */}
@@ -95,12 +96,13 @@ function App() {
                 element={<AdminRoute><BookingsPage isAdminView={true} /></AdminRoute>} 
               />
 
-              {/* Haddii URL khaldan la qoro ama meel aan jirin, ku celi Home */}
+              {/* FALLBACK */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </main>
       </div>
+
       <Footer />
     </div>
   );

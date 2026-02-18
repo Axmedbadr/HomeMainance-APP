@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { authService } from '../services/authService.js';
-import api from '../services/api'; // Hubi inuu jiro faylkan api-ga ah
+import api from '../services/api'; 
 import toast from 'react-hot-toast';
 
 export const AuthContext = createContext(null);
@@ -33,7 +33,6 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  // 1. LOGIN LOGIC
   const login = async (credentials) => {
     try {
       const response = await authService.login(credentials);
@@ -51,17 +50,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 2. REGISTER LOGIC
   const register = async (userData) => {
     try {
       const response = await authService.register(userData);
+      // Haddii uu yahay Customer, si toos ah u login garee
       if (response && response.token && userData.role !== 'provider') {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
         setUser(response.user);
         setIsAuthenticated(true);
         toast.success('Diiwaangelintu waa guul!');
-      } else if (userData.role === 'provider') {
+      } 
+      // Haddii uu yahay Provider, fariin uun u dir (Admin approval ayuu sugayaa)
+      else if (userData.role === 'provider') {
         toast.success('Codsigaaga waa la diray, sug ansixinta adminka.');
       }
       return response;
@@ -72,20 +73,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 3. UPDATE USER LOGIC (KAN AYAA KAA MAQNAA)
   const updateUser = async (updatedData) => {
     try {
-      // Halkan waxaan xogta u diraynaa backend-ka si loogu keydiyo DB-ga
-      // Hubi in URL-ka backend-ka uu yahay /users/profile ama kan aad u dhisatay
+      // Hubi in endpoint-ka backend-ka uu yahay /users/profile
       const response = await api.put('/users/profile', updatedData); 
+      const newUserXog = response.data.user || response.data;
       
-      const newUserXog = response.data.user || response.data; // Xogta cusub ee soo noqotay
-
-      // 1. Cusboonaysii State-ka React-ka
       setUser(newUserXog);
-      // 2. Cusboonaysii LocalStorage-ka si haddii page-ka la refresh gareeyo xogtu u jiro
       localStorage.setItem('user', JSON.stringify(newUserXog));
-      
       toast.success('Profile-ka waa la cusboonaysiiyey!');
       return newUserXog;
     } catch (error) {
@@ -95,7 +90,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 4. LOGOUT LOGIC
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -105,7 +99,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ 
+        user, 
+        isAuthenticated, 
+        isLoading, 
+        login, 
+        register, 
+        logout, 
+        updateUser
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext'; 
-import { FiBriefcase, FiTool } from 'react-icons/fi';
+import { FiBriefcase, FiTool, FiUser, FiPhone, FiMail, FiMapPin, FiLock, FiCheckCircle } from 'react-icons/fi';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-// MUHIIM: Soo dhoofso axios si xogta loogu diro Backend-ka
-import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name is too short'),
@@ -38,103 +37,117 @@ const Register = () => {
   const onSubmit = async (data) => {
     try {
       const { confirmPassword, ...userData } = data;
-      
-      // 1. Diiwaangeli Account-ka (User model)
       await submitUser(userData);
 
-      // 2. Haddii uu yahay Professional, u dir xogta ururinta 'providers'
       if (isProvider) {
-        const providerData = {
-          fullName: data.name,
-          email: data.email,
-          phone: data.phone,
-          serviceType: data.serviceType,
-          location: data.location,
-          bio: data.bio,
-          status: 'pending' // Kani wuxuu hubinayaa in Admin-ku arko
-        };
-
-        // Hubi in Port-ka (5006) uu la mid yahay kan server.js-kaaga
-        await axios.post('http://localhost:5006/api/providers/apply', providerData);
-
-        alert("Codsigaaga waa la diray! Adminka ayaa dib kaaga soo jawaabi doona email.");
+        toast.success("Professional application submitted!");
         navigate('/pending-approval'); 
       } else {
-        alert("Diiwaangelintaadu way guulaysatay!");
+        toast.success("Registration successful!");
         navigate('/services'); 
       }
     } catch (error) {
       console.error('Registration error:', error);
-      alert("Khalad ayaa dhacay: " + (error.response?.data?.message || "Server-ka lama heli karo"));
+      toast.error(error.response?.data?.message || "Server connection failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] py-16 px-6">
-      <div className="max-w-[550px] w-full bg-white rounded-[3rem] shadow-2xl p-10 md:p-12">
-        <h1 className="text-3xl font-black text-center mb-8">
-          {isProvider ? 'Partner Join' : 'Create Account'}
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#f0f9ff] py-20 px-6 relative overflow-hidden">
+      {/* Decorative Orbs */}
+      <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-sky-200/40 rounded-full blur-[120px] -z-10"></div>
+      <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-blue-200/40 rounded-full blur-[120px] -z-10"></div>
+
+      <div className="max-w-[600px] w-full bg-white/80 backdrop-blur-xl rounded-[3.5rem] shadow-[0_40px_100px_rgba(186,230,253,0.3)] border border-white p-10 md:p-14 relative">
+        
+        {/* Header Section */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-sky-500 text-white rounded-[1.5rem] shadow-lg shadow-sky-200 mb-6">
+            {isProvider ? <FiTool size={30} /> : <FiUser size={30} />}
+          </div>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
+            {isProvider ? 'Partner ' : 'Create '} 
+            <span className="text-sky-500 italic">{isProvider ? 'Join' : 'Account'}</span>
+          </h1>
+          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] mt-2">Start your journey with HomeCare Elite</p>
+        </div>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="relative">
-            <FiBriefcase className="absolute left-4 top-4 text-slate-400" />
-            <select {...register('role')} className="w-full pl-12 py-4 bg-slate-50 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+          
+          {/* Role Selection */}
+          <div className="relative group">
+            <FiBriefcase className="absolute left-5 top-5 text-slate-300 group-focus-within:text-sky-500 transition-colors" size={18} />
+            <select {...register('role')} className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-[1.8rem] font-bold outline-none ring-sky-100 focus:ring-4 transition-all appearance-none text-slate-700">
               <option value="customer">Customer (Looking for services)</option>
               <option value="provider">Professional (Offering services)</option>
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <input {...register('name')} placeholder="Full Name" className="w-full px-5 py-4 bg-slate-50 rounded-2xl font-bold border-none" />
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="relative group">
+              <FiUser className="absolute left-5 top-5 text-slate-300 group-focus-within:text-sky-500" size={18} />
+              <input {...register('name')} placeholder="Full Name" className="w-full pl-14 pr-4 py-5 bg-slate-50 rounded-[1.8rem] font-bold border-none focus:ring-4 ring-sky-100 transition-all" />
+              {errors.name && <p className="text-rose-500 text-[10px] font-black uppercase mt-2 ml-4">{errors.name.message}</p>}
             </div>
-            <div>
-              <input {...register('phone')} placeholder="Phone (e.g. 063...)" className="w-full px-5 py-4 bg-slate-50 rounded-2xl font-bold border-none" />
-              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+            <div className="relative group">
+              <FiPhone className="absolute left-5 top-5 text-slate-300 group-focus-within:text-sky-500" size={18} />
+              <input {...register('phone')} placeholder="Phone Number" className="w-full pl-14 pr-4 py-5 bg-slate-50 rounded-[1.8rem] font-bold border-none focus:ring-4 ring-sky-100 transition-all" />
+              {errors.phone && <p className="text-rose-500 text-[10px] font-black uppercase mt-2 ml-4">{errors.phone.message}</p>}
             </div>
           </div>
 
-          <input {...register('email')} type="email" placeholder="Email Address" className="w-full px-5 py-4 bg-slate-50 rounded-2xl font-bold border-none" />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          <div className="relative group">
+            <FiMail className="absolute left-5 top-5 text-slate-300 group-focus-within:text-sky-500" size={18} />
+            <input {...register('email')} type="email" placeholder="Email Address" className="w-full pl-14 pr-4 py-5 bg-slate-50 rounded-[1.8rem] font-bold border-none focus:ring-4 ring-sky-100 transition-all" />
+            {errors.email && <p className="text-rose-500 text-[10px] font-black uppercase mt-2 ml-4">{errors.email.message}</p>}
+          </div>
 
-          <input {...register('location')} placeholder="Your City/Location" className="w-full px-5 py-4 bg-slate-50 rounded-2xl font-bold border-none" />
-          {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
+          <div className="relative group">
+            <FiMapPin className="absolute left-5 top-5 text-slate-300 group-focus-within:text-sky-500" size={18} />
+            <input {...register('location')} placeholder="Your Location (City/Region)" className="w-full pl-14 pr-4 py-5 bg-slate-50 rounded-[1.8rem] font-bold border-none focus:ring-4 ring-sky-100 transition-all" />
+            {errors.location && <p className="text-rose-500 text-[10px] font-black uppercase mt-2 ml-4">{errors.location.message}</p>}
+          </div>
 
+          {/* Provider Specific Section */}
           {isProvider && (
-            <div className="p-5 bg-blue-50 rounded-2xl space-y-3 border border-blue-100">
-              <label className="text-[10px] font-bold uppercase text-blue-600 tracking-widest flex items-center">
-                <FiTool className="mr-1" /> Professional Details
+            <div className="p-8 bg-sky-50/50 border border-sky-100 rounded-[2.5rem] space-y-4 animate-in fade-in zoom-in duration-300">
+              <label className="text-[10px] font-black uppercase text-sky-600 tracking-[0.3em] flex items-center px-2">
+                <FiCheckCircle className="mr-2" /> Professional Profile
               </label>
-              <select {...register('serviceType')} className="w-full p-3 bg-white rounded-xl font-bold outline-none border-none">
+              <select {...register('serviceType')} className="w-full p-4 bg-white rounded-2xl font-bold outline-none border-none shadow-sm text-slate-700">
                 <option value="">Select Specialty</option>
                 <option value="Plumbing">Plumbing</option>
                 <option value="Electrical">Electrical</option>
                 <option value="Cleaning">Cleaning</option>
                 <option value="Carpentry">Carpentry</option>
               </select>
-              <textarea {...register('bio')} placeholder="Briefly describe your experience..." className="w-full p-3 bg-white rounded-xl font-bold h-20 border-none outline-none" />
+              <textarea {...register('bio')} placeholder="Describe your professional experience..." className="w-full p-4 bg-white rounded-2xl font-bold h-24 border-none outline-none shadow-sm resize-none" />
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <input {...register('password')} type="password" placeholder="Password" className="w-full px-5 py-4 bg-slate-50 rounded-2xl font-bold border-none" />
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="relative group">
+              <FiLock className="absolute left-5 top-5 text-slate-300 group-focus-within:text-sky-500" size={18} />
+              <input {...register('password')} type="password" placeholder="Password" className="w-full pl-14 pr-4 py-5 bg-slate-50 rounded-[1.8rem] font-bold border-none focus:ring-4 ring-sky-100 transition-all" />
+              {errors.password && <p className="text-rose-500 text-[10px] font-black uppercase mt-2 ml-4">{errors.password.message}</p>}
             </div>
-            <div>
-              <input {...register('confirmPassword')} type="password" placeholder="Confirm" className="w-full px-5 py-4 bg-slate-50 rounded-2xl font-bold border-none" />
-              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+            <div className="relative group">
+              <FiLock className="absolute left-5 top-5 text-slate-300 group-focus-within:text-sky-500" size={18} />
+              <input {...register('confirmPassword')} type="password" placeholder="Confirm" className="w-full pl-14 pr-4 py-5 bg-slate-50 rounded-[1.8rem] font-bold border-none focus:ring-4 ring-sky-100 transition-all" />
+              {errors.confirmPassword && <p className="text-rose-500 text-[10px] font-black uppercase mt-2 ml-4">{errors.confirmPassword.message}</p>}
             </div>
           </div>
 
-          <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg active:scale-95">
-            {isSubmitting ? 'Processing...' : 'Register Now'}
+          <button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className="w-full bg-sky-500 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.4em] text-[10px] hover:bg-slate-900 transition-all shadow-xl shadow-sky-100 active:scale-95 disabled:opacity-50 mt-4"
+          >
+            {isSubmitting ? 'Securing Profile...' : 'Complete Registration'}
           </button>
           
-          <p className="text-center text-slate-500 font-bold text-sm">
-            Already have an account? <Link to="/login" className="text-blue-600">Login</Link>
+          <p className="text-center text-slate-400 font-bold text-xs pt-4">
+            Already a member? <Link to="/login" className="text-sky-500 underline underline-offset-8 decoration-2 hover:text-slate-900">Sign In</Link>
           </p>
         </form>
       </div>

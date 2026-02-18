@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react'; 
 import { useAuth } from '../context/AuthContext';
 import { bookingService } from '../services/bookingService'; 
-import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit2, FiCheck, FiX, FiActivity, FiCalendar, FiArrowRight } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit2, FiCheck, FiX, FiActivity, FiCalendar, FiArrowRight, FiShield } from 'react-icons/fi';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
-// Schema-ga oo lagu daray address validation
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  phone: z.string().min(8, 'Phone number must be valid'), // Waxaan ka dhigay 8 maadaama nambarada qaar gaaban yihiin
-  address: z.string().min(5, 'Fadlan qor halka aad deggan tahay (Location)'),
+  phone: z.string().min(8, 'Please enter a valid phone number'),
+  address: z.string().min(5, 'Please provide your service location'),
 });
 
 const ProfilePage = () => {
@@ -33,23 +33,20 @@ const ProfilePage = () => {
     },
   });
 
-  // Soo ridi ballanta u dambaysay ee macmiilka
   useEffect(() => {
     const fetchLastBooking = async () => {
       try {
         const res = await bookingService.getUserBookings();
         if (res.data && res.data.length > 0) {
-          // Waxaan qaadanaynaa midda u dambaysay
           setLastBooking(res.data[0]);
         }
       } catch (err) {
-        console.error("Error fetching recent activity:", err);
+        console.error("Error fetching activity:", err);
       }
     };
     if (user) fetchLastBooking();
   }, [user]);
 
-  // Cusboonaysiinta Form-ka marka user-ku isbeddelo
   useEffect(() => {
     reset({
       name: user?.name || '',
@@ -60,183 +57,187 @@ const ProfilePage = () => {
 
   const onSubmit = async (data) => {
     try {
-      // Halkan waxaa muhiim ah in Backend-kaagu aqbalo address variable-ka
       await updateUser({ ...user, ...data });
       setIsEditing(false);
-      alert("Profile-kaaga waa la cusboonaysiiyey!");
+      toast.success("Profile updated successfully!");
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert("Cilad ayaa dhacday markii profile-ka la beddelayay.");
+      toast.error("Failed to update profile settings.");
     }
   };
 
   if (!user) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center">
-        <div className="w-16 h-16 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest">Loading Account</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+        <div className="w-12 h-12 border-2 border-indigo-600/10 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em]">Syncing Profile</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen pb-20">
-      {/* Header Banner */}
-      <div className="bg-[#0a0f1d] pt-16 pb-32 px-6">
-        <div className="container mx-auto max-w-4xl text-center md:text-left">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="w-24 h-24 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[2rem] flex items-center justify-center text-white text-4xl font-black shadow-2xl shadow-blue-500/30">
-              {user.name?.charAt(0)}
+    <div className="bg-[#fcfdfe] min-h-screen pb-24 font-sans">
+      {/* --- MINIMAL HEADER --- */}
+      <div className="bg-white border-b border-slate-100 pt-20 pb-12 px-6">
+        <div className="container mx-auto max-w-5xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <div className="w-24 h-24 bg-slate-900 rounded-[2.5rem] flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-slate-200">
+                  {user.name?.charAt(0)}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-emerald-500 border-4 border-white rounded-full"></div>
+              </div>
+              <div className="text-center md:text-left">
+                <h1 className="text-4xl font-black text-slate-900 tracking-tighter">{user.name}</h1>
+                <div className="flex items-center gap-2 mt-1 text-slate-400 font-bold text-xs uppercase tracking-widest">
+                  <FiShield className="text-indigo-600" /> Verified Resident Member
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <h1 className="text-4xl font-black text-white tracking-tight mb-2">{user.name}</h1>
-              <p className="text-white/50 font-medium italic">Welcome back to your Home Maintenance portal.</p>
-            </div>
-            <Link to="/my-bookings" className="bg-white/5 border border-white/10 p-4 rounded-2xl hover:bg-white/10 transition-all group">
-               <p className="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-1">Active Bookings</p>
-               <div className="flex items-center gap-2 text-white font-bold">
-                 View Schedule <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
-               </div>
+            
+            <Link to="/my-bookings" className="group flex items-center gap-4 bg-slate-50 border border-slate-100 p-2 pr-6 rounded-full hover:bg-white hover:shadow-lg transition-all duration-300">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-90 transition-transform">
+                <FiCalendar className="text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">Schedule</p>
+                <p className="text-slate-900 font-black text-sm flex items-center gap-2">View Bookings <FiArrowRight /></p>
+              </div>
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 -mt-16 max-w-4xl">
-        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200 border border-slate-100 overflow-hidden">
+      <div className="container mx-auto px-6 mt-12 max-w-5xl">
+        <div className="grid lg:grid-cols-3 gap-12">
           
-          <div className="p-8 md:p-10 border-b border-slate-50 flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Account Settings</h2>
-              <p className="text-slate-400 text-sm font-medium">Keep your information up to date.</p>
+          {/* --- SETTINGS SIDEBAR --- */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-[3rem] border border-slate-100 p-8 md:p-12 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Personal Details</h2>
+                  <p className="text-slate-400 font-medium text-sm">Manage your contact and delivery info</p>
+                </div>
+                {!isEditing && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                  >
+                    <FiEdit2 size={20} />
+                  </button>
+                )}
+              </div>
+
+              {isEditing ? (
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormInput label="Full Name" register={register('name')} error={errors.name} icon={FiUser} />
+                    <FormInput label="Phone Number" register={register('phone')} error={errors.phone} icon={FiPhone} />
+                  </div>
+                  <FormInput label="Service Address" register={register('address')} error={errors.address} icon={FiMapPin} placeholder="e.g. Hargeisa, Jigjiga Yar" />
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex-1 bg-slate-900 text-white py-4 rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? <FiActivity className="animate-spin" /> : <FiCheck size={18} />} Update Profile
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setIsEditing(false); reset(); }}
+                      className="px-8 bg-slate-50 text-slate-400 py-4 rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all"
+                    >
+                      <FiX size={18} />
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-y-12 gap-x-8">
+                  <InfoBlock icon={FiUser} label="Legal Name" value={user.name} />
+                  <InfoBlock icon={FiMail} label="Email Address" value={user.email} />
+                  <InfoBlock icon={FiPhone} label="Contact" value={user.phone || 'Not provided'} />
+                  <InfoBlock icon={FiMapPin} label="Home Location" value={user.address || 'Address pending'} />
+                </div>
+              )}
             </div>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 bg-slate-50 text-slate-900 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-              >
-                <FiEdit2 size={14} /> Edit Profile
-              </button>
-            )}
           </div>
 
-          <div className="p-8 md:p-12">
-            {isEditing ? (
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest ml-2 text-slate-400">Full Name</label>
-                    <div className="relative">
-                      <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="text"
-                        {...register('name')}
-                        className={`w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 transition-all ${errors.name ? 'ring-2 ring-red-500' : 'focus:ring-blue-600'}`}
-                      />
-                    </div>
-                    {errors.name && <p className="text-xs text-red-500 font-bold ml-2">{errors.name.message}</p>}
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest ml-2 text-slate-400">Phone Number</label>
-                    <div className="relative">
-                      <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="tel"
-                        {...register('phone')}
-                        className={`w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 transition-all ${errors.phone ? 'ring-2 ring-red-500' : 'focus:ring-blue-600'}`}
-                      />
-                    </div>
-                    {errors.phone && <p className="text-xs text-red-500 font-bold ml-2">{errors.phone.message}</p>}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest ml-2 text-slate-400">Current Address / Location</label>
-                  <div className="relative">
-                    <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="text"
-                      {...register('address')}
-                      placeholder="Tusaale: Hargeisa, Jigjiga Yar"
-                      className={`w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 transition-all ${errors.address ? 'ring-2 ring-red-500' : 'focus:ring-blue-600'}`}
-                    />
-                  </div>
-                  {errors.address && <p className="text-xs text-red-500 font-bold ml-2">{errors.address.message}</p>}
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting ? <><FiActivity className="animate-spin" /> Saving...</> : <><FiCheck /> Update Account</>}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setIsEditing(false); reset(); }}
-                    className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
-                  >
-                    <FiX /> Cancel
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="space-y-12">
-                <div className="grid md:grid-cols-2 gap-y-10 gap-x-12">
-                  <InfoRow icon={FiUser} label="Full Name" value={user.name} color="blue" />
-                  <InfoRow icon={FiMail} label="Email Address" value={user.email} color="indigo" />
-                  <InfoRow icon={FiPhone} label="Contact Number" value={user.phone || 'Lama hayo'} color="emerald" />
-                  <InfoRow icon={FiMapPin} label="Service Address" value={user.address || 'Location-ka lama hayo'} color="amber" />
-                </div>
-
-                {lastBooking && (
-                  <div className="bg-slate-50 rounded-3xl p-6 border border-dashed border-slate-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <FiCalendar className="text-blue-600" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recent Activity</span>
+          {/* --- RECENT ACTIVITY SIDEBAR --- */}
+          <div className="lg:col-span-1">
+            <div className="bg-slate-900 rounded-[3rem] p-8 text-white shadow-2xl shadow-slate-200 sticky top-8">
+              <h3 className="text-xl font-black tracking-tight mb-8">Activity Status</h3>
+              
+              {lastBooking ? (
+                <div className="space-y-6">
+                  <div className="bg-white/5 border border-white/10 rounded-[2rem] p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center">
+                        <FiActivity size={20} />
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold border uppercase ${
-                        lastBooking.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-white text-slate-500 border-slate-100'
+                      <span className={`text-[9px] font-black uppercase px-3 py-1 rounded-full border ${
+                        lastBooking.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/10 border-white/10 text-slate-400'
                       }`}>
                         {lastBooking.status}
                       </span>
                     </div>
-                    <p className="text-slate-900 font-bold">
-                      Latest request for: <span className="text-blue-600">{lastBooking.service?.fullName || "Professional Service"}</span>
-                    </p>
+                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Latest Request</p>
+                    <p className="text-lg font-bold leading-tight mb-4">{lastBooking.service?.fullName || "Professional Service"}</p>
+                    <Link to="/my-bookings" className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 hover:text-white transition-colors">
+                      Track Progress <FiArrowRight />
+                    </Link>
                   </div>
-                )}
+                </div>
+              ) : (
+                <div className="text-center py-10 opacity-30">
+                  <FiCalendar className="mx-auto mb-4" size={40} />
+                  <p className="text-xs font-bold uppercase tracking-widest">No recent bookings</p>
+                </div>
+              )}
+              
+              <div className="mt-8 pt-8 border-t border-white/10">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 text-center">Member Since 2026</p>
               </div>
-            )}
+            </div>
           </div>
+
         </div>
       </div>
     </div>
   );
 };
 
-const InfoRow = ({ icon: Icon, label, value, color }) => {
-  const colors = {
-    blue: 'bg-blue-50 text-blue-600',
-    indigo: 'bg-indigo-50 text-indigo-600',
-    emerald: 'bg-emerald-50 text-emerald-600',
-    amber: 'bg-amber-50 text-amber-600'
-  };
-  
-  return (
-    <div className="flex items-center gap-6 group">
-      <div className={`w-14 h-14 ${colors[color]} rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300`}>
-        <Icon size={24} />
+/* --- SUB-COMPONENTS FOR CLEANER CODE --- */
+
+const FormInput = ({ label, register, error, icon: Icon, placeholder }) => (
+  <div className="space-y-2">
+    <label className="text-[9px] font-black uppercase tracking-widest ml-4 text-slate-400">{label}</label>
+    <div className="relative group">
+      <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors">
+        <Icon size={18} />
       </div>
-      <div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-        <p className="text-lg font-black text-slate-900 tracking-tight">{value}</p>
-      </div>
+      <input
+        {...register}
+        placeholder={placeholder}
+        className={`w-full pl-14 pr-6 py-4 bg-slate-50 border-2 border-transparent rounded-[1.5rem] font-bold text-slate-900 outline-none transition-all focus:bg-white focus:border-indigo-600/20 focus:ring-4 focus:ring-indigo-600/5 ${error ? 'border-red-500/20 bg-red-50' : ''}`}
+      />
     </div>
-  );
-};
+    {error && <p className="text-[10px] text-red-500 font-bold ml-4">{error.message}</p>}
+  </div>
+);
+
+const InfoBlock = ({ icon: Icon, label, value }) => (
+  <div className="flex items-start gap-5 group">
+    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
+      <Icon size={22} />
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 leading-none">{label}</p>
+      <p className="text-base font-black text-slate-900 tracking-tight truncate">{value}</p>
+    </div>
+  </div>
+);
 
 export default ProfilePage;

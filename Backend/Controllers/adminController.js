@@ -2,27 +2,40 @@ import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Booking from '../models/Booking.js';
 
-// 1. Dashboard Stats
+// 1. Dashboard Stats - Lagu daray sarraynta xogta (Aggregation)
 export const getAdminStats = async (req, res) => {
     try {
         const totalUsers = await User.countDocuments({ role: 'customer' });
         const totalBookings = await Booking.countDocuments();
         const activeProviders = await User.countDocuments({ role: 'provider' });
         
-        // Helitaanka tirada codsiyada ku jira collection-ka kale
+        // 1a. Helitaanka tirada codsiyada ku jira collection-ka kale
         const pendingCount = await mongoose.connection.db.collection('providers').countDocuments({ status: 'pending' });
 
+        // 1b. Revenue-ka dhabta ah: Waxaan xisaabinaynaa kaliya ballamaha 'completed' ama 'approved' ah
         const revenueData = await Booking.aggregate([
-            { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+            { 
+                $match: { 
+                    status: { $in: ['approved', 'completed'] } 
+                } 
+            },
+            { 
+                $group: { 
+                    _id: null, 
+                    total: { $sum: "$totalPrice" } 
+                } 
+            }
         ]);
 
         res.status(200).json({
             success: true,
-            totalUsers,
-            totalBookings,
-            totalRevenue: revenueData[0]?.total || 0,
-            activeProviders,
-            pendingProviders: pendingCount
+            stats: {
+                totalUsers,        // MACAAMIISHA (Sawirkaaga 1aad)
+                totalBookings,     // BOOKINGS (Sawirkaaga 2aad)
+                totalRevenue: revenueData[0]?.total || 0, // REVENUE (Sawirkaaga 3aad)
+                activeProviders,   // ACTIVE PROVIDERS (Sawirkaaga 4aad)
+                pendingProviders: pendingCount
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -45,37 +58,38 @@ export const getPendingProviders = async (req, res) => {
 export const approveProvider = async (req, res) => {
     try {
         const { id } = req.params;
+        
+        // Hubi haddii ID-gu uu yahay mid sax ah
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "ID-ga codsigu ma saxna" });
+        }
+
         const providerData = await mongoose.connection.db.collection('providers').findOne({ _id: new mongoose.Types.ObjectId(id) });
 
         if (!providerData) {
             return res.status(404).json({ success: false, message: "Codsiga lama helin" });
         }
 
-        /**
-         * XALKA DUPLICATE ERROR:
-         * Waxaan isticmaaleynaa findOneAndUpdate oo leh 'upsert: true'.
-         * Haddii qofku jiro, role-ka ayaa laga dhigayaa 'provider'.
-         * Haddii uusan jirin, qof cusub ayaa la abuurayaa.
-         */
+        // XALKA DUPLICATE: Cusboonaysiin ama Abuurid
         await User.findOneAndUpdate(
             { email: providerData.email },
             { 
                 $set: {
-                    name: providerData.fullName,
+                    name: providerData.fullName || providerData.name,
                     email: providerData.email,
                     phone: providerData.phone,
                     role: 'provider',
                     isVerified: true
                 },
-                $setOnInsert: { password: "temporaryPassword123" }
+                $setOnInsert: { password: "temporaryPassword123" } 
             },
             { upsert: true, new: true }
         );
 
-        // Ugu dambayn ka tirtir codsiga collection-ka 'providers'
+        // Ka tirtir codsiga maadaama la ansixiyey
         await mongoose.connection.db.collection('providers').deleteOne({ _id: new mongoose.Types.ObjectId(id) });
         
-        res.status(200).json({ success: true, message: "Xirfadlaha waa la ansixiyey si guul leh" });
+        res.status(200).json({ success: true, message: "Xirfadlaha waa la ansixiyey, hadda wuxuu ka mid yahay Providers-ka" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -86,6 +100,10 @@ export const approveProvider = async (req, res) => {
 export const rejectProvider = async (req, res) => {
     try {
         const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "ID-ga ma saxna" });
+        }
+        
         await mongoose.connection.db.collection('providers').deleteOne({ _id: new mongoose.Types.ObjectId(id) });
         res.status(200).json({ success: true, message: "Codsigii waa la diiday waana la tirtiray" });
     } catch (error) {

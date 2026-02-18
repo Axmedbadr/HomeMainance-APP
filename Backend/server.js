@@ -23,14 +23,15 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("✅ MongoDB Connected!"))
     .catch((err) => console.error("❌ Database Error:", err));
 
-// 3. ISKU XIRKA ROUTES
-// Hubi in kuwani ay u qoran yihiin sida saxda ah si looga fogaado 404 Error
-app.use('/api/users', userRoutes);      // Kani waa kan maareeya /register
+// 3. ISKU XIRKA ROUTES (HALKAN AYAA MUHIIM AH)
+// Hadda Frontend-kaagu wuxuu si sax ah u heli doonaa /api/auth/forgot-password
+app.use('/api/auth', userRoutes);      
+app.use('/api/users', userRoutes);      
 app.use('/api/services', serviceRoutes);
 app.use('/api/providers', providerRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
-app.use('/api/admin', adminRoutes);     // Kan ayaa xalliyay 404 error-kii Dashboard-ka
+app.use('/api/admin', adminRoutes); 
 
 // 4. Global Error Handler
 app.use((err, req, res, next) => {
@@ -40,15 +41,6 @@ app.use((err, req, res, next) => {
         message: "Cillad farsamo ayaa dhacday!",
         error: process.env.NODE_ENV === 'development' ? err.message : {}
     });
-});
-
-// Ka hortagga in server-ku u dhaco cillad aan la fileyn
-process.on('uncaughtException', (err) => {
-    console.error('💥 Uncaught Exception:', err);
-});
-
-process.on('unhandledRejection', (err) => {
-    console.error('💥 Unhandled Rejection:', err);
 });
 
 const PORT = process.env.PORT || 5006;

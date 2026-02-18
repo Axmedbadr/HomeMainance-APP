@@ -1,54 +1,77 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiTool, FiClock, FiShield, FiStar, FiChevronRight } from 'react-icons/fi';
+import { FiClock, FiShield, FiStar, FiChevronRight, FiZap, FiTarget, FiCheckCircle } from 'react-icons/fi';
 import ServiceList from '../components/services/ServiceList';
 
 const Home = () => {
   return (
-    <div className="bg-[#f4f7fa] min-h-screen font-sans antialiased text-[#1a2b4b]">
+    <div className="bg-[#f8fafc] min-h-screen font-sans antialiased text-[#020617]">
       
-      {/* --- HERO SECTION --- */}
-      <section className="relative p-4 md:p-8"> 
-        <div className="relative overflow-hidden bg-[#0a192f] rounded-[2.5rem] md:rounded-[4rem] min-h-[85vh] flex items-center shadow-2xl">
-          <div className="absolute top-0 right-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_top_right,_#1e3a8a,_transparent)]"></div>
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
+      {/* --- ELITE HERO SECTION --- */}
+      <section className="relative p-4 md:p-10"> 
+        <div className="relative overflow-hidden bg-[#020617] rounded-[3.5rem] md:rounded-[5rem] min-h-[90vh] flex items-center shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
+          {/* Animated Background Gradients */}
+          <div className="absolute top-0 right-0 w-full h-full opacity-30 bg-[radial-gradient(circle_at_top_right,_#0ea5e9,_transparent_50%)]"></div>
+          <div className="absolute -bottom-24 -left-24 w-[500px] h-[500px] bg-sky-500/10 rounded-full blur-[120px]"></div>
 
-          <div className="container mx-auto px-8 md:px-16 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8 py-12">
-                <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                  <span className="text-blue-100 text-[10px] font-bold tracking-[0.3em] uppercase">Premier Excellence</span>
+          <div className="container mx-auto px-8 md:px-20 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-20 items-center">
+              <div className="space-y-10 py-20">
+                <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2 rounded-full backdrop-blur-md">
+                  <span className="w-2 h-2 bg-sky-400 rounded-full animate-ping"></span>
+                  <span className="text-sky-100 text-[10px] font-black tracking-[0.4em] uppercase">The Future of Care</span>
                 </div>
                 
-                <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.05] tracking-tight">
-                  Modern Care <br />
-                  <span className="text-[#3b82f6]">For Modern</span> <br />
-                  Lifestyles.
+                <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.95] tracking-tighter">
+                  Expertise <br />
+                  <span className="text-sky-500 italic">On Demand.</span>
                 </h1>
                 
-                <p className="text-slate-400 text-lg max-w-md leading-relaxed font-medium">
-                  Experience the next generation of home maintenance. Verified professionals, seamless booking, and unmatched quality.
+                <p className="text-slate-400 text-xl max-w-lg leading-relaxed font-medium">
+                  Connect with the world's most disciplined home specialists. Every booking is a commitment to perfection.
                 </p>
                 
-                <div className="flex flex-wrap gap-5 pt-4">
-                  <Link to="/services" className="px-10 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20 flex items-center group">
-                    Explore Services
-                    <FiChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                  <Link to="/register" className="px-10 py-4 bg-transparent border border-white/20 text-white rounded-2xl font-bold hover:bg-white/10 transition-all">
-                    Get Started
-                  </Link>
-                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-6 pt-10">
+  {/* Launch Catalog */}
+  <Link 
+    to="/services" 
+    className="group relative min-w-[240px] px-10 py-6 bg-sky-500 text-[#020617] rounded-[2rem] font-black text-[11px] uppercase tracking-[0.3em] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(14,165,233,0.4)] hover:-translate-y-1 active:scale-95 overflow-hidden"
+  >
+    {/* Shine Effect */}
+    <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+    
+    <span className="relative z-10 flex items-center justify-center gap-2">
+      More Services
+      <FiChevronRight className="group-hover:translate-x-2 transition-transform duration-300" size={18} />
+    </span>
+  </Link>
+
+  {/* Join Ecosystem */}
+  <Link 
+    to="/register" 
+    className="min-w-[240px] px-10 py-6 bg-transparent border-2 border-white/10 text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.3em] flex items-center justify-center transition-all duration-500 hover:bg-white hover:text-[#020617] hover:border-white hover:-translate-y-1 active:scale-95"
+  >
+    Join US
+  </Link>
+
+  {/* Ku dar CSS-kan haddii uusan horay ugu jirin faylkaaga CSS */}
+  <style>{`
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+  `}</style>
+</div>
               </div>
 
-              <div className="hidden lg:block relative">
-                <div className="bg-white/5 border border-white/10 p-4 rounded-[3rem] backdrop-blur-xl rotate-3 shadow-2xl">
-                   <div className="bg-[#0f172a] rounded-[2.5rem] p-8 grid grid-cols-2 gap-4">
-                      <div className="h-32 bg-blue-600/20 rounded-2xl border border-blue-500/20 flex items-center justify-center text-4xl">🛠️</div>
-                      <div className="h-32 bg-indigo-600/20 rounded-2xl border border-indigo-500/20 flex items-center justify-center text-4xl">⚡</div>
-                      <div className="h-32 bg-slate-800 rounded-2xl border border-white/5 flex items-center justify-center text-4xl">🚿</div>
-                      <div className="h-32 bg-blue-500 rounded-2xl flex items-center justify-center text-4xl">🏠</div>
+              {/* Decorative Hero Visual */}
+              <div className="hidden lg:block relative group">
+                <div className="absolute -inset-10 bg-sky-500/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                <div className="bg-white/5 border border-white/10 p-6 rounded-[4rem] backdrop-blur-2xl -rotate-2 shadow-2xl transition-transform duration-700 group-hover:rotate-0">
+                   <div className="bg-[#0f172a] rounded-[3rem] p-10 grid grid-cols-2 gap-6 border border-white/5">
+                      <div className="aspect-square bg-sky-500/10 rounded-[2rem] border border-sky-500/20 flex items-center justify-center text-5xl hover:bg-sky-500/20 transition-colors">⚙️</div>
+                      <div className="aspect-square bg-emerald-500/10 rounded-[2rem] border border-emerald-500/20 flex items-center justify-center text-5xl hover:bg-emerald-500/20 transition-colors">💎</div>
+                      <div className="aspect-square bg-amber-500/10 rounded-[2rem] border border-amber-500/20 flex items-center justify-center text-5xl hover:bg-amber-500/20 transition-colors">⚡</div>
+                      <div className="aspect-square bg-sky-500 rounded-[2rem] flex items-center justify-center text-5xl shadow-xl shadow-sky-500/20">🏡</div>
                    </div>
                 </div>
               </div>
@@ -57,57 +80,67 @@ const Home = () => {
         </div>
       </section>
 
-      {/* --- FEATURES SECTION --- */}
-      <section className="py-24 px-8 md:px-16">
+      {/* --- CORE PILLARS SECTION --- */}
+      <section className="py-32 px-10">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-1 space-y-4">
-              <h2 className="text-3xl font-black tracking-tight leading-none">Why Us?</h2>
-              <div className="w-12 h-1 bg-blue-600 rounded-full"></div>
-              <p className="text-slate-500 text-sm font-medium">Elevating home standards with precision and trust.</p>
+          <div className="grid lg:grid-cols-4 gap-12 items-center">
+            <div className="lg:col-span-1 space-y-6">
+              <div className="w-16 h-2 bg-sky-500 rounded-full"></div>
+              <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Why <br/> Elite Care?</h2>
+              <p className="text-slate-500 text-sm font-medium leading-relaxed">Redefining service industry benchmarks through digital precision and vetted talent.</p>
             </div>
             
-            <FeatureItem icon={FiShield} title="Trusted Pros" desc="Vetted & verified experts." />
-            <FeatureItem icon={FiClock} title="Swift Booking" desc="Fast and easy scheduling." />
-            <FeatureItem icon={FiStar} title="Top Quality" desc="Rated 4.9/5 by users." />
+            <FeatureItem icon={FiShield} title="Verified Protocol" desc="Rigorous background checks for every specialist." />
+            <FeatureItem icon={FiZap} title="Instant Sync" desc="Real-time scheduling with immediate confirmation." />
+            <FeatureItem icon={FiTarget} title="Precision Quality" desc="Delivering 99.9% client satisfaction rating." />
           </div>
         </div>
       </section>
 
-      {/* --- SERVICES LIST SECTION --- */}
-      <section className="px-4 md:px-8 pb-12">
-        <div className="bg-white rounded-[3rem] md:rounded-[5rem] py-20 px-8 md:px-16 shadow-sm border border-slate-100">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div className="max-w-xl space-y-2">
-              <h2 className="text-4xl font-black tracking-tight">Featured Services</h2>
-              <p className="text-slate-500 font-medium">Choose a category to find your specialist.</p>
+      {/* --- DYNAMIC SERVICE MARKETPLACE --- */}
+      <section className="px-6 md:px-10 pb-20">
+        <div className="bg-white rounded-[4rem] md:rounded-[6rem] py-24 px-10 md:px-20 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.03)] border border-sky-50 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-10">
+            <div className="max-w-xl space-y-4">
+               <span className="text-sky-500 text-[10px] font-black uppercase tracking-[0.5em]">Curated Expertise</span>
+               <h2 className="text-5xl font-black tracking-tighter text-slate-900">Featured <span className="text-slate-300 italic">Deployments.</span></h2>
+               <p className="text-slate-500 font-medium text-lg">Select a specialized category to engage with our verified professionals.</p>
             </div>
-            <Link to="/services" className="text-blue-600 font-bold flex items-center gap-2 group hover:gap-4 transition-all">
-              View All <FiChevronRight />
+            <Link to="/services" className="group px-8 py-4 bg-slate-50 text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-3 hover:bg-[#020617] hover:text-white transition-all duration-500">
+              View Full Index <FiChevronRight className="group-hover:translate-x-2 transition-transform" />
             </Link>
           </div>
           
           <div className="relative z-10">
-            {/* Tallaabada 2aad: Waxaan halkan ku darnay isHome={true} */}
             <ServiceList limit={6} isHome={true} />
           </div>
         </div>
       </section>
 
-      <footer className="py-12 text-center text-slate-400 text-[10px] uppercase tracking-[0.4em]">
-        © 2026 Premium Home Maintenance • Quality Guaranteed
+      {/* --- FOOTER --- */}
+      <footer className="py-20 text-center space-y-6">
+        <div className="flex items-center justify-center gap-2">
+           <FiCheckCircle className="text-sky-500" size={16}/>
+           <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.4em]">Authorized Premium Platform</span>
+        </div>
+        <p className="text-slate-400 text-[9px] uppercase tracking-[0.6em]">
+          © 2026 Elite Home Ecosystem • Engineering Excellence
+        </p>
       </footer>
     </div>
   );
 };
 
 const FeatureItem = ({ icon: Icon, title, desc }) => (
-  <div className="bg-white p-8 rounded-[2rem] border border-slate-50 shadow-sm hover:shadow-md transition-all group">
-    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors">
-      <Icon className="text-blue-600 group-hover:text-white" size={24} />
+  <div className="bg-white p-10 rounded-[3rem] border border-sky-50 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.02)] hover:shadow-2xl hover:shadow-sky-100 transition-all duration-500 group relative overflow-hidden">
+    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-sky-500 group-hover:rotate-[360deg] transition-all duration-700">
+      <Icon className="text-sky-500 group-hover:text-white" size={28} />
     </div>
-    <h3 className="text-lg font-bold mb-1 tracking-tight">{title}</h3>
-    <p className="text-slate-500 text-xs font-medium">{desc}</p>
+    <h3 className="text-xl font-black mb-2 tracking-tighter text-slate-900 uppercase">{title}</h3>
+    <p className="text-slate-500 text-sm font-medium leading-relaxed">{desc}</p>
+    <div className="absolute -bottom-2 -right-2 text-slate-50 opacity-0 group-hover:opacity-100 transition-opacity">
+       <Icon size={80} />
+    </div>
   </div>
 );
 

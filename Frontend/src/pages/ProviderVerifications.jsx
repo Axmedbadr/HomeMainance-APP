@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { FiCheckCircle, FiXCircle, FiMail, FiMapPin } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle, FiMail, FiMapPin, FiBriefcase, FiAlertCircle, FiLoader } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 
 const ProviderVerifications = () => {
   const [pendingProviders, setPendingProviders] = useState([]);
@@ -13,66 +14,101 @@ const ProviderVerifications = () => {
   const fetchPendingProviders = async () => {
     try {
       const response = await api.get('/providers');
-      // Waxaan sifeeynaa oo kaliya kuwa 'pending' ah
       const pending = response.data.filter(p => p.status === 'pending');
       setPendingProviders(pending);
     } catch (error) {
-      console.error("Cillad xogta bixiyeyaasha:", error);
+      console.error("Error fetching providers:", error);
+      toast.error("Failed to load verification requests");
     } finally {
       setLoading(false);
     }
   };
 
   const handleApprove = async (id, email) => {
-    if (window.confirm(`Ma hubtaa inaad ansixiso oo aad martiqaad u dirto ${email}?`)) {
+    if (window.confirm(`Are you sure you want to approve and invite ${email}?`)) {
       try {
-        // Backend function-ka 'updateProviderStatus'
         await api.patch(`/providers/${id}/status`, { status: 'approved' });
-        
-        // Farriin muujinaysa in martiqaad loo diray
-        alert(`Waa la ansixiyey! Martiqaad ayaa loo diray ${email} si uu password u samaysto.`);
+        toast.success(`Approved! Invitation sent to ${email}`);
         fetchPendingProviders();
       } catch (error) {
-        alert("Ansixinta waa fashilantay.");
+        toast.error("Approval process failed.");
       }
     }
   };
 
-  if (loading) return <div className="p-10 text-center">Loading applications...</div>;
+  if (loading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+      <FiLoader className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+      <p className="text-slate-500 font-bold animate-pulse">Loading applications...</p>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] py-12 px-6">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-black text-slate-900 mb-8">Codsiyada Cusub (Pending)</h1>
+    <div className="min-h-screen bg-[#f8fafc] py-12 px-4 sm:px-8">
+      <div className="max-w-5xl mx-auto">
+        
+        {/* Header Section */}
+        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-black text-slate-900 tracking-tight">Provider Verification</h1>
+            <p className="text-slate-500 mt-1 font-medium">Review and manage new professional applications</p>
+          </div>
+          <div className="bg-white px-5 py-2 rounded-2xl border border-slate-200 shadow-sm self-start">
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Total Pending:</span>
+            <span className="ml-2 text-indigo-600 font-black">{pendingProviders.length}</span>
+          </div>
+        </div>
         
         {pendingProviders.length === 0 ? (
-          <div className="bg-white p-12 rounded-[2.5rem] text-center border-2 border-dashed border-slate-200">
-            <p className="text-slate-500 font-bold text-lg">Ma jiraan codsiyo cusub hadda.</p>
+          <div className="bg-white p-16 rounded-[3rem] text-center border-2 border-dashed border-slate-200 shadow-sm">
+            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <FiCheckCircle className="w-10 h-10 text-slate-300" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-800">All caught up!</h2>
+            <p className="text-slate-500 mt-2 font-medium">There are no pending provider applications at the moment.</p>
           </div>
         ) : (
           <div className="grid gap-6">
             {pendingProviders.map((provider) => (
-              <div key={provider._id} className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="flex-1">
-                  <h3 className="text-xl font-black text-slate-900">{provider.fullName}</h3>
-                  <div className="flex flex-wrap gap-4 mt-2 text-slate-500 font-medium text-sm">
-                    <span className="flex items-center gap-1"><FiMail /> {provider.email}</span>
-                    <span className="flex items-center gap-1"><FiMapPin /> {provider.location}</span>
-                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-black uppercase">
-                      {provider.serviceType}
-                    </span>
+              <div 
+                key={provider._id} 
+                className="group bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500"
+              >
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-2xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
+                        {provider.fullName}
+                      </h3>
+                      <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider">
+                        {provider.serviceType}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-y-2 gap-x-6 text-slate-500 font-semibold text-sm">
+                      <span className="flex items-center gap-2">
+                        <FiMail className="text-slate-400" /> {provider.email}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <FiMapPin className="text-slate-400" /> {provider.location}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-2xl text-xs font-bold w-fit">
+                    <FiAlertCircle /> Awaiting Identity Verification
                   </div>
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="flex gap-3 w-full lg:w-auto border-t lg:border-t-0 pt-6 lg:pt-0">
                   <button 
                     onClick={() => handleApprove(provider._id, provider.email)}
-                    className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-emerald-700 transition-colors"
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-black hover:bg-emerald-600 shadow-lg shadow-slate-200 hover:shadow-emerald-200 transition-all active:scale-95"
                   >
-                    <FiCheckCircle /> Ansixi & Invite
+                    <FiCheckCircle size={18} /> Approve & Invite
                   </button>
-                  <button className="flex items-center gap-2 bg-rose-50 text-rose-600 px-6 py-3 rounded-2xl font-bold hover:bg-rose-100 transition-colors">
-                    <FiXCircle /> Diid
+                  <button className="flex items-center justify-center bg-rose-50 text-rose-600 px-6 py-4 rounded-2xl font-black hover:bg-rose-600 hover:text-white transition-all active:scale-95">
+                    <FiXCircle size={18} /> Reject
                   </button>
                 </div>
               </div>

@@ -1,31 +1,31 @@
 // src/components/bookings/BookingStatus.jsx
 import React from 'react'
-import { FiCheckCircle, FiClock, FiXCircle, FiActivity } from 'react-icons/fi'
+import { FiCheckCircle, FiClock, FiXCircle, FiActivity, FiArrowUpRight } from 'react-icons/fi'
 
 const BookingStatus = ({ status }) => {
   const statusConfig = {
     pending: {
       icon: FiClock,
-      color: 'text-amber-600',
-      bg: 'bg-amber-50',
-      border: 'border-amber-100',
-      dot: 'bg-amber-500',
+      color: 'text-sky-600',
+      bg: 'bg-sky-50/50',
+      border: 'border-sky-100',
+      dot: 'bg-sky-400',
       label: 'Awaiting Approval',
-      description: 'Your request is in queue for verification.',
+      description: 'Request is in queue for verification.',
     },
     confirmed: {
       icon: FiActivity,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50',
-      border: 'border-blue-100',
-      dot: 'bg-blue-500',
+      color: 'text-indigo-600',
+      bg: 'bg-indigo-50/50',
+      border: 'border-indigo-100',
+      dot: 'bg-indigo-500',
       label: 'Confirmed',
       description: 'Provider is scheduled for arrival.',
     },
     completed: {
       icon: FiCheckCircle,
       color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
+      bg: 'bg-emerald-50/50',
       border: 'border-emerald-100',
       dot: 'bg-emerald-500',
       label: 'Service Completed',
@@ -34,11 +34,11 @@ const BookingStatus = ({ status }) => {
     cancelled: {
       icon: FiXCircle,
       color: 'text-rose-600',
-      bg: 'bg-rose-50',
+      bg: 'bg-rose-50/50',
       border: 'border-rose-100',
       dot: 'bg-rose-500',
-      label: 'Cancelled',
-      description: 'This booking has been revoked.',
+      label: 'Revoked',
+      description: 'This booking has been cancelled.',
     },
   }
 
@@ -46,28 +46,36 @@ const BookingStatus = ({ status }) => {
   const Icon = config.icon
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Status Badge */}
+    <div className="flex flex-col gap-3 group">
+      {/* Status Badge Container */}
       <div 
-        className={`inline-flex items-center self-start gap-2.5 px-4 py-2 rounded-2xl border ${config.bg} ${config.border} transition-all duration-300 shadow-sm`}
+        className={`inline-flex items-center self-start gap-3 px-5 py-2.5 rounded-full border backdrop-blur-md ${config.bg} ${config.border} transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.03)] group-hover:shadow-lg group-hover:-translate-y-0.5`}
       >
-        {/* Animated Status Dot */}
-        <div className="relative flex h-2 w-2">
-          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${config.dot} opacity-75`}></span>
-          <span className={`relative inline-flex rounded-full h-2 w-2 ${config.dot}`}></span>
+        {/* Animated Status Indicator */}
+        <div className="relative flex h-2.5 w-2.5">
+          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${config.dot} opacity-40`}></span>
+          <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${config.dot} shadow-[0_0_10px_rgba(0,0,0,0.1)]`}></span>
         </div>
 
-        <Icon className={`${config.color}`} size={16} />
+        {/* Status Text & Icon */}
+        <div className="flex items-center gap-2">
+          <Icon className={`${config.color} group-hover:scale-110 transition-transform`} size={14} />
+          <span className={`text-[11px] font-black uppercase tracking-[0.25em] ${config.color} leading-none`}>
+            {config.label}
+          </span>
+        </div>
         
-        <span className={`text-[10px] font-black uppercase tracking-[0.15em] ${config.color}`}>
-          {config.label}
-        </span>
+        {/* Subtle Decorative Element */}
+        <FiArrowUpRight size={10} className={`${config.color} opacity-30`} />
       </div>
 
-      {/* Mini Description (Optional) */}
-      <p className="text-[11px] font-medium text-slate-400 ml-1 italic">
-        {config.description}
-      </p>
+      {/* Modern Sub-text */}
+      <div className="flex items-center gap-2 ml-1">
+        <div className={`w-1 h-1 rounded-full ${config.dot} opacity-30`}></div>
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          {config.description}
+        </p>
+      </div>
     </div>
   )
 }

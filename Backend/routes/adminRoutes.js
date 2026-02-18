@@ -1,29 +1,27 @@
+// routes/adminRoutes.js
 import express from 'express';
+import { 
+    getAdminStats, 
+    getPendingProviders, 
+    approveProvider, 
+    rejectProvider 
+} from '../Controllers/adminController.js';
+import { getAdminDashboardStats } from '../Controllers/controllerBooking.js'; // Shaqada cusub
+import { protect, admin } from '../Middleware/auth.js';
+
 const router = express.Router();
 
-// Soo jiid functions-ka controller-ka
-// Hubi in getAdminStats lagu daray halkan
-import { 
-  getAdminStats, 
-  getPendingProviders, 
-  approveProvider, 
-  rejectProvider 
-} from '../Controllers/adminController.js';
+// 1. Dashboard-ka Guud (Macaamiisha, Bookings, Revenue, Active Providers)
+// Kani wuxuu xallinayaa 16-ka inuu 3 noqdo
+router.get('/stats', protect, admin, getAdminStats);
 
-// 1. Dashboard Stats (Kani waa kan muhiimka ah ee xallinaya 404 error)
-// GET: /api/admin/stats
-router.get('/stats', getAdminStats);
+// 2. Dashboard-ka Labaad (Total Requests, Pending, Completed, Total Spent)
+// Kani wuxuu xallinayaa "0"-yada sawirka image_77c0be.png
+router.get('/dashboard-stats', protect, admin, getAdminDashboardStats);
 
-// 2. Hel dhammaan codsiyada sugaya (Pending)
-// GET: /api/admin/pending-providers
-router.get('/pending-providers', getPendingProviders);
-
-// 3. Ansixi codsi gaar ah (Approve)
-// PUT: /api/admin/approve-provider/:id
-router.put('/approve-provider/:id', approveProvider);
-
-// 4. Diid codsi gaar ah (Reject)
-// PUT: /api/admin/reject-provider/:id
-router.put('/reject-provider/:id', rejectProvider);
+// 3. Maamulka Khubarada (Providers Management)
+router.get('/pending-providers', protect, admin, getPendingProviders);
+router.put('/approve-provider/:id', protect, admin, approveProvider);
+router.delete('/reject-provider/:id', protect, admin, rejectProvider);
 
 export default router;

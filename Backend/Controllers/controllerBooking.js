@@ -45,11 +45,11 @@ export const createBooking = async (req, res) => {
     }
 };
 
-// 4. ADMIN ONLY: Kani waa kan maqnaa ee Error-ka keenay!
+// 4. ADMIN ONLY: Wax ka beddelka Status-ka (Approved/Rejected)
 export const updateBookingStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; // 'approved' ama 'rejected'
+        const { status } = req.body; 
         
         const updatedBooking = await Booking.findByIdAndUpdate(
             id, 
@@ -62,6 +62,69 @@ export const updateBookingStatus = async (req, res) => {
         }
 
         res.status(200).json({ success: true, data: updatedBooking });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// 5. CUSTOMER ONLY: Soo dirista Transaction ID
+export const updatePaymentStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { transactionId } = req.body;
+
+        if (!transactionId) {
+            return res.status(400).json({ success: false, message: "Transaction ID waa muhiim" });
+        }
+
+        const updatedBooking = await Booking.findByIdAndUpdate(
+            id,
+            { transactionId },
+            { new: true }
+        );
+
+        if (!updatedBooking) {
+            return res.status(404).json({ success: false, message: "Ballanta lama helin" });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Xogta lacagta waa la helay", 
+            data: updatedBooking 
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// 6. ADMIN ONLY: Xogta Dashboard-ka (Final Component)
+// Shaqadan waxay isugu geyneysaa xogta "Total Requests", "Pending", "Completed" iyo Lacagta.
+export const getAdminDashboardStats = async (req, res) => {
+    try {
+        // Isugeynta dhammaan ballamaha platform-ka
+        const totalRequests = await Booking.countDocuments();
+
+        // Ballamaha sugaya in lala tacaalo
+        const pendingActions = await Booking.countDocuments({ status: 'pending' });
+
+        // Ballamaha si guul leh u dhammaaday
+        const completed = await Booking.countDocuments({ status: 'completed' });
+
+        // Xisaabinta guud ahaan lacagta soo xarootay (Revenue)
+        const revenueData = await Booking.aggregate([
+            { $match: { status: 'completed' } },
+            { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            stats: {
+                totalRequests,
+                pendingActions,
+                completed,
+                totalSpent: revenueData[0]?.total || 0
+            }
+        });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

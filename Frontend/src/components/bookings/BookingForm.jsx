@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
+import { FiCalendar, FiClock, FiMapPin, FiMessageSquare, FiSend, FiArrowLeft } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const BookingForm = () => {
@@ -16,9 +17,8 @@ const BookingForm = () => {
     description: ''
   });
 
-  // Tijaabo: Hubi haddii user-ku jiro marka bogga la furo
   useEffect(() => {
-    console.log("Hadda login waxaa ku jira:", user); // Ka eeg Inspect -> Console
+    console.log("Current Logged User:", user);
   }, [user]);
 
   const handleChange = (e) => {
@@ -28,9 +28,8 @@ const BookingForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Safety Check: Haddii uusan user-ku jirin, ha u oggolaan inuu ballan qabsado
     if (!user || (!user._id && !user.id)) {
-      toast.error("Fadlan markale Login soo samee, xogtaada lama hayo.");
+      toast.error("Session expired. Please log in again.");
       return;
     }
 
@@ -43,61 +42,138 @@ const BookingForm = () => {
         }
       };
 
-      // Payload-ka saxda ah ee xallinaya "userId is required"
       const bookingData = {
-        userId: user._id || user.id, // Server-ku kan ayuu u baahan yahay
+        userId: user._id || user.id,
         service: providerId,
         date: formData.date,
         time: formData.time,
         address: formData.address,
-        description: formData.description || "Ma jirto sharaxaad la bixiyey.",
-        totalPrice: 25 // Tan ayaa xallinaysa $0
+        description: formData.description || "No description provided.",
+        totalPrice: 25 
       };
 
-      console.log("Xogta loo dirayo Server-ka:", bookingData);
+      console.log("Sending to Server:", bookingData);
 
       const response = await axios.post('http://localhost:5006/api/bookings', bookingData, config);
 
       if (response.data.success) {
-        toast.success('Ballanta si guul leh ayaa loo qabtay!');
+        toast.success('Appointment booked successfully! ✨');
         navigate('/bookings'); 
       }
     } catch (error) {
-      // Qabashada 500 Error-ka
-      const errorMsg = error.response?.data?.message || 'Cillad ayaa dhacday server-ka';
+      const errorMsg = error.response?.data?.message || 'Server connection error';
       toast.error(errorMsg);
       console.error("Booking Error Details:", error.response?.data);
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-10 bg-white rounded-[2.5rem] shadow-2xl mt-10 border border-gray-100">
-      <h2 className="text-3xl font-black mb-8 text-center text-gray-800 italic tracking-tighter">Confirm Booking</h2>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2 ml-1">Appointment Date</label>
-          <input type="date" name="date" required onChange={handleChange} className="w-full bg-gray-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold text-gray-700" />
-        </div>
-        
-        <div>
-          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2 ml-1">Preferred Time</label>
-          <input type="time" name="time" required onChange={handleChange} className="w-full bg-gray-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold text-gray-700" />
-        </div>
-
-        <div>
-          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2 ml-1">Service Address</label>
-          <input type="text" name="address" placeholder="e.g. Boqoljire, Hargeisa" required onChange={handleChange} className="w-full bg-gray-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-semibold" />
-        </div>
-
-        <div>
-          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2 ml-1">Additional Notes</label>
-          <textarea name="description" placeholder="Describe the problem..." onChange={handleChange} className="w-full bg-gray-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all h-28" />
-        </div>
-
-        <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl active:scale-95 mt-4">
-          Booking Now
+    <div className="min-h-screen bg-[#f0f9ff] py-16 px-6 relative overflow-hidden flex flex-col items-center">
+      {/* Background Orbs */}
+      <div className="absolute top-[-5%] left-[-5%] w-[35%] h-[35%] bg-sky-200/40 rounded-full blur-[100px] -z-10"></div>
+      
+      <div className="max-w-xl w-full">
+        {/* Back Link */}
+        <button 
+          onClick={() => navigate(-1)} 
+          className="flex items-center gap-2 text-sky-600 font-black text-[10px] uppercase tracking-widest mb-8 hover:text-slate-900 transition-all group"
+        >
+          <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Providers
         </button>
-      </form>
+
+        {/* Main Card */}
+        <div className="bg-white/80 backdrop-blur-xl p-10 md:p-14 rounded-[3.5rem] shadow-[0_40px_100px_rgba(186,230,253,0.3)] border border-white relative">
+          
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-sky-500 text-white rounded-[1.5rem] shadow-lg shadow-sky-100 mb-6 transform -rotate-3">
+              <FiCalendar size={30} />
+            </div>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tighter leading-none">
+              HOME <span className="text-sky-500 italic">Booking</span>
+            </h2>
+            <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] mt-3">Reserve your premium home service</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-2 gap-5">
+              {/* Date */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-sky-600 ml-2">
+                  <FiCalendar size={12} /> Appointment Date
+                </label>
+                <input 
+                  type="date" 
+                  name="date" 
+                  required 
+                  onChange={handleChange} 
+                  className="w-full bg-slate-50 border-none p-4 rounded-2xl focus:ring-4 focus:ring-sky-100 transition-all font-bold text-slate-700 outline-none" 
+                />
+              </div>
+              
+              {/* Time */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-sky-600 ml-2">
+                  <FiClock size={12} /> Preferred Time
+                </label>
+                <input 
+                  type="time" 
+                  name="time" 
+                  required 
+                  onChange={handleChange} 
+                  className="w-full bg-slate-50 border-none p-4 rounded-2xl focus:ring-4 focus:ring-sky-100 transition-all font-bold text-slate-700 outline-none" 
+                />
+              </div>
+            </div>
+
+            {/* Address */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-sky-600 ml-2">
+                <FiMapPin size={12} /> Service Address
+              </label>
+              <input 
+                type="text" 
+                name="address" 
+                placeholder="District, Street Name, House #" 
+                required 
+                onChange={handleChange} 
+                className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-4 focus:ring-sky-100 transition-all font-semibold text-slate-700 outline-none placeholder:text-slate-300" 
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-sky-600 ml-2">
+                <FiMessageSquare size={12} /> Job Details
+              </label>
+              <textarea 
+                name="description" 
+                placeholder="Describe the issue or service needed..." 
+                onChange={handleChange} 
+                className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-4 focus:ring-sky-100 transition-all h-32 outline-none resize-none font-medium text-slate-700 placeholder:text-slate-300" 
+              />
+            </div>
+
+            {/* Summary Tag */}
+            <div className="bg-sky-50 rounded-2xl p-4 flex justify-between items-center border border-sky-100 border-dashed">
+               <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest">Base Rate</span>
+               <span className="text-xl font-black text-slate-900">$25.00</span>
+            </div>
+
+            <button 
+              type="submit" 
+              className="group relative w-full bg-sky-500 text-white py-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.4em] overflow-hidden transition-all hover:bg-slate-900 hover:shadow-2xl hover:shadow-sky-200 active:scale-95 flex items-center justify-center gap-3 mt-4"
+            >
+              Confirm & Book <FiSend className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            </button>
+          </form>
+
+          {/* Verification Badge */}
+          <p className="text-center mt-8 text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">
+            &bull; Secure Payment Processing &bull;
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

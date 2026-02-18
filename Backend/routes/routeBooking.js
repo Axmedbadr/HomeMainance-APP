@@ -3,15 +3,23 @@ import {
     getMyBookings, 
     createBooking, 
     getAllBookings,
-    updateBookingStatus // Magacaan waa inuu la mid yahay kan Controller-ka
+    updateBookingStatus,
+    updatePaymentStatus // 1. Hubi inaan lagu soo daray Controller-ka
 } from '../Controllers/controllerBooking.js';
 import { protect, admin } from '../Middleware/auth.js'; 
 
 const router = express.Router();
 
+// 1. Routes-ka Macmiilka (Customer)
 router.post('/', protect, createBooking);
 router.get('/my-bookings', protect, getMyBookings);
-router.get('/all', protect, admin, getAllBookings); // Admin kaliya
-router.put('/status/:id', protect, admin, updateBookingStatus); // Admin kaliya
+
+// 2. Route-ka Lacag Bixinta (Payment) - KAN AYAA KA MAQNAA
+// Macmiilku waa inuu awoodaa inuu u soo diro Transaction ID
+router.put('/payment/:id', protect, updatePaymentStatus);
+
+// 3. Routes-ka Admin-ka
+router.get('/all', protect, admin, getAllBookings); 
+router.put('/status/:id', protect, admin, updateBookingStatus); 
 
 export default router;

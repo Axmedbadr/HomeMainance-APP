@@ -6,32 +6,32 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true }, 
     phone: { type: String },
-    // --- KHADADKA LAGU DARAY SI LOCATION-KU U SHAQEEYO ---
     location: { type: String, default: "" }, 
     bio: { type: String, default: "" },
     serviceType: { type: String, default: "Professional Specialist" },
-    // ---------------------------------------------------
     isVerified: { type: Boolean, default: false },
     role: { 
         type: String, 
         enum: ['customer', 'admin', 'provider'], 
         default: 'customer' 
-    }
+    },
+    // KHADADKAN AYAA KA MAQNAA OO PASSWORD RESET-KA KEENAYAY ERROR
+    resetPasswordToken: { type: String },
+    resetPasswordExpire: { type: Date },
+    isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
-// Password-ka qari (Hash) ka hor keydinta
+// Password-ka qari (Hash)
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     const salt = await bcrypt.genSalt(10); 
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Function-ka hubinta password-ka (Login)
-userSchema.methods.matchPassword = async function (enteredPassword) {
+// MAGACAN WAA INUU NOQDAA comparePassword SI UU CONTROLLER-KA ULA SHAQEEYO
+userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Ka hortagga "OverwriteModelError"
 const User = mongoose.models.User || mongoose.model('User', userSchema);
-
 export default User;

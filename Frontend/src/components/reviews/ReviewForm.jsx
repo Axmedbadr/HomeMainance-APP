@@ -4,7 +4,7 @@ import reviewService from '../../services/reviewService'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { FiStar, FiSend, FiMessageSquare, FiActivity } from 'react-icons/fi'
+import { FiStar, FiSend, FiMessageSquare, FiActivity, FiAward } from 'react-icons/fi'
 
 const reviewSchema = z.object({
   rating: z.number().min(1, 'Please select a rating').max(5),
@@ -45,31 +45,37 @@ const ReviewForm = ({ serviceId, providerId, onReviewAdded }) => {
       reset()
       setSelectedRating(0)
       if (onReviewAdded) onReviewAdded()
-      // Waxaan ku bedelay Alert-ga UI jilicsan haddii aad rabto, laakiin logic-gii waa sidii
     } catch (error) {
       console.error('Error creating review:', error)
     }
   }
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden transition-all duration-500 hover:shadow-blue-900/5">
+    <div className="bg-white rounded-[3rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] border border-sky-50 overflow-hidden transition-all duration-500">
       
-      {/* Header Section */}
-      <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
-        <div className="relative z-10">
-          <h2 className="text-2xl font-black tracking-tight mb-1 text-white">Share Your Experience</h2>
-          <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">Feedback drives excellence</p>
+      {/* Premium Header */}
+      <div className="bg-[#020617] p-10 relative overflow-hidden">
+        <div className="relative z-10 flex items-center gap-5">
+          <div className="w-14 h-14 bg-sky-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-sky-500/20">
+            <FiAward size={28} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black tracking-tighter text-white uppercase">Client <span className="text-sky-500">Insight</span></h2>
+            <p className="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em]">Your feedback powers our ecosystem</p>
+          </div>
         </div>
-        <FiMessageSquare className="absolute -right-4 -bottom-4 text-white/5 w-24 h-24 rotate-12" />
+        <FiMessageSquare className="absolute -right-6 -bottom-6 text-white/[0.03] w-40 h-40 rotate-12" />
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8">
-        {/* Star Selection Area */}
-        <div className="flex flex-col items-center justify-center py-4 space-y-4 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Overall Satisfaction
+      <form onSubmit={handleSubmit(onSubmit)} className="p-10 space-y-10">
+        
+        {/* Elite Star Selection */}
+        <div className="flex flex-col items-center justify-center py-10 space-y-6 bg-slate-50/50 rounded-[2.5rem] border border-sky-50 relative overflow-hidden group">
+          <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+            Service Quality Assessment
           </label>
-          <div className="flex space-x-2">
+          
+          <div className="flex space-x-3 relative z-10">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -77,64 +83,68 @@ const ReviewForm = ({ serviceId, providerId, onReviewAdded }) => {
                 onMouseEnter={() => setHoverRating(star)}
                 onMouseLeave={() => setHoverRating(0)}
                 onClick={() => handleRatingClick(star)}
-                className="group relative p-1 transition-all duration-300 active:scale-90"
+                className="group relative p-1 transition-all duration-300 active:scale-75"
               >
                 <FiStar 
-                  size={36} 
-                  className={`transition-all duration-300 ${
+                  size={42} 
+                  className={`transition-all duration-500 ${
                     (hoverRating || selectedRating) >= star 
-                      ? 'text-yellow-400 scale-110' 
+                      ? 'text-amber-400 scale-110 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]' 
                       : 'text-slate-200'
                   }`} 
                   fill={(hoverRating || selectedRating) >= star ? "currentColor" : "none"} 
+                  strokeWidth={1.5}
                 />
-                {(hoverRating || selectedRating) >= star && (
-                  <span className="absolute inset-0 bg-yellow-400/20 blur-xl rounded-full scale-150 -z-10"></span>
-                )}
               </button>
             ))}
           </div>
+
           {errors.rating && (
-            <p className="text-[10px] font-bold text-rose-500 uppercase tracking-tighter">{errors.rating.message}</p>
+            <p className="absolute bottom-4 text-[9px] font-black text-rose-500 uppercase tracking-widest animate-pulse">
+              {errors.rating.message}
+            </p>
           )}
         </div>
 
-        {/* Comment Field */}
-        <div className="space-y-3">
-          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">
-            <FiMessageSquare className="text-blue-500" />
-            Detailed Review
-          </label>
+        {/* Professional Comment Area */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-end px-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-2">
+              <FiMessageSquare className="text-sky-500" size={14} /> Performance Notes
+            </label>
+            {errors.comment && <span className="text-[9px] font-black text-rose-500 uppercase italic">Minimum 10 chars required</span>}
+          </div>
+          
           <textarea
             {...register('comment')}
             rows={4}
-            className={`w-full px-6 py-5 bg-slate-50 border-none rounded-[1.5rem] font-bold text-slate-900 focus:ring-2 transition-all resize-none placeholder:text-slate-300 ${errors.comment ? 'ring-2 ring-rose-500' : 'focus:ring-blue-600'}`}
-            placeholder="Tell us what you liked or how we can improve..."
+            className={`w-full px-8 py-6 bg-slate-50 border-2 rounded-[2rem] font-bold text-slate-900 transition-all duration-300 resize-none placeholder:text-slate-300 placeholder:font-medium text-sm ${
+              errors.comment ? 'border-rose-100 bg-rose-50/30' : 'border-transparent focus:border-sky-100 focus:bg-white focus:shadow-inner'
+            }`}
+            placeholder="Document your experience with this specialist..."
           />
-          {errors.comment && (
-            <p className="text-[10px] font-bold text-rose-500 ml-2 uppercase tracking-tighter">{errors.comment.message}</p>
-          )}
         </div>
 
-        {/* Submit Button */}
+        {/* Global Submit Action */}
         <button
           type="submit"
           disabled={isSubmitting || selectedRating === 0}
-          className="group relative w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] overflow-hidden transition-all hover:bg-slate-900 hover:shadow-xl hover:shadow-blue-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group relative w-full h-20 bg-[#020617] text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.4em] overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-sky-200 active:scale-[0.97] disabled:opacity-30 disabled:grayscale"
         >
-          <span className="relative z-10 flex items-center justify-center gap-3">
+          <div className="absolute inset-0 bg-sky-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+          
+          <span className="relative z-10 flex items-center justify-center gap-4">
             {isSubmitting ? (
               <>
-                <FiActivity className="animate-spin" />
-                Submitting Feedback...
+                <FiActivity className="animate-spin" size={20} />
+                Processing Transaction...
               </>
             ) : (
               <>
-                Submit Review <FiSend className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                Finalize Review <FiSend className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-500" size={16} />
               </>
             )}
           </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </button>
       </form>
     </div>

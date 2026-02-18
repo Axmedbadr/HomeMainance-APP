@@ -1,16 +1,16 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import { User, Provider } from '../models/models.js';
-import { protect } from '../Middleware/auth.js';
+import { protect } from '../middleware/auth.js'; 
 
 const router = express.Router();
 
-// 1. DIIWAANGELINTA
+// 1. DIIWAANGELINTA (Register)
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, phone, role } = req.body;
-        const userExists = await User.findOne({ email });
+        const { name, email, password, phone, role, serviceType, location, bio } = req.body;
         
+        const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ success: false, message: "Email-kan hore ayaa loo isticmaalay" });
 
         const user = await User.create({ 
@@ -18,59 +18,102 @@ router.post('/register', async (req, res) => {
             role: role || 'customer' 
         });
 
+        if (user.role === 'provider') {
+            await Provider.create({
+                user: user._id,
+                fullName: name,
+                email: email,
+                phone: phone,
+                serviceType: serviceType || 'General', 
+                location: location || 'Not Specified',
+                bio: bio || '',
+                status: 'pending' 
+            });
+        }
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
         res.status(201).json({ success: true, token, user: { id: user._id, name: user.name, role: user.role } });
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// 2. PROVIDER APPLY
-router.post('/providers/apply', async (req, res) => {
+// 2. ADMIN-KA OO AQBALAYA CODSIGA
+router.put('/approve-provider/:id', protect, async (req, res) => {
     try {
-        const { fullName, email, phone, serviceType, location, bio } = req.body;
-        const alreadyApplied = await Provider.findOne({ email });
-        if (alreadyApplied) return res.status(400).json({ message: "Codsi hore ayaa laga hayaa email-kan" });
+        const { status } = req.body; 
 
-        await Provider.create({ fullName, email, phone, serviceType, location, bio, status: 'pending' });
-        res.status(201).json({ success: true, message: "Codsigaaga waa la helid!" });
+        let provider = await Provider.findById(req.params.id);
+        if (!provider) {
+            provider = await Provider.findOne({ user: req.params.id });
+        }
+
+        if (!provider) {
+            return res.status(404).json({ success: false, message: "Khabiirka lama helin!" });
+        }
+
+        provider.status = status;
+        await provider.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: `Khabiirka ${provider.fullName} hadda waa ${status}`,
+            data: provider 
+        });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// 3. HELITAANKA DHAMAAN KHUBARADA
+// 3. HELITAANKA DHAMAAN KHUBARADA (Kaliya kuwa 'approved' ah)
 router.get('/all-providers', async (req, res) => {
     try {
-        const activeProviders = await User.find({ role: 'provider' }).select('-password');
+        const activeProviders = await Provider.find({ status: 'approved' })
+            .populate('user', 'name phone email')
+            .sort({ updatedAt: -1 });
+
         res.status(200).json({ success: true, data: activeProviders });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// --- 4. HALKAN AYAA KA MAQNAA (HELITAANKA HAL KHABIIR) ---
-// Route-kan wuxuu saxayaa cilada 404 ee Profile-ka
+// 4. HELITAANKA HAL KHABIIR (Profile Page - KANI AYAA KAA MAQNAA)
 router.get('/provider/:id', async (req, res) => {
     try {
-        const provider = await User.findById(req.params.id).select('-password');
+        const provider = await Provider.findById(req.params.id).populate('user', 'name phone email');
+        
         if (!provider) {
-            return res.status(404).json({ success: false, message: "Khabiirka lama helin" });
+            return res.status(404).json({ success: false, message: "Khabiirka lama helin!" });
         }
+
         res.status(200).json({ success: true, data: provider });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// 5. LOGIN
+// 5. HELITAANKA CODSYADA SUGAN (Pending for Admin)
+router.get('/pending-providers', protect, async (req, res) => {
+    try {
+        const pending = await Provider.find({ status: 'pending' }).populate('user', 'name phone email');
+        res.status(200).json({ success: true, data: pending });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// 6. LOGIN
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
+        
         if (!user || !(await user.matchPassword(password))) {
             return res.status(401).json({ success: false, message: "Email ama Password khaldan" });
         }
+        
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
         res.json({ success: true, token, user: { id: user._id, name: user.name, role: user.role } });
     } catch (error) {

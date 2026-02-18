@@ -10,40 +10,60 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['customer', 'admin', 'provider'], default: 'customer' }
 }, { timestamps: true });
 
-// Password-ka qari ka hor intaanan la keydin
+// Password hashing
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// --- KANI WAA QAYBTII KA DHIMNAYD ---
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 // 2. Provider Schema
 const providerSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  fullName: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  serviceType: { type: String, required: true },
-  location: { type: String, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+  fullName: { type: String }, 
+  email: { type: String },    
+  serviceType: { type: String, default: 'General' },
+  location: { type: String, default: 'Not Specified' },
+  hourlyRate: { type: Number, default: 0 },       
+  bio: { type: String, default: "" },             
+  skills: [{ type: String }],                     
+  experience: { type: Number, default: 0 },       
+  certificates: [{ type: String }],              
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' }
 }, { timestamps: true });
 
-// 3. Booking Schema
+// 3. Booking Schema (LA SAXAY - FINAL)
 const bookingSchema = new mongoose.Schema({
-  service: { type: String, required: true }, 
-  provider: { type: mongoose.Schema.Types.ObjectId, ref: 'Provider' }, 
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+  // 'service' halkan wuxuu tixraacayaa Provider-ka (ama Adeegga)
+  service: { type: mongoose.Schema.Types.ObjectId, ref: 'Provider', required: true }, 
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  date: { type: String, required: true },
+  time: { type: String },
+  address: { type: String, required: true },
+  description: { type: String, default: "No description provided" },
+  totalPrice: { type: Number, default: 25 },
+  
+  // Status-yada loo baahan yahay si Frontend-ku u shaqeeyo
+  status: { 
+    type: String, 
+    enum: ['pending', 'approved', 'completed', 'rejected', 'cancelled'], 
+    default: 'pending' 
+  },
+
+  // Qaybta lacag bixinta oo muhiim ah
+  transactionId: { type: String, default: null },
+  paidAt: { type: Date, default: null }
 }, { timestamps: true });
 
 // 4. Review Schema
 const reviewSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  rating: { type: Number, required: true },
+  provider: { type: mongoose.Schema.Types.ObjectId, ref: 'Provider' }, 
+  rating: { type: Number, required: true, min: 1, max: 5 },
   comment: { type: String, required: true }
 }, { timestamps: true });
 

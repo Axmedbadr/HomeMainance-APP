@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { 
   FiHome, FiShoppingBag, FiUsers, 
-  FiLogOut, FiMenu, FiX, FiCheckSquare, FiLayout 
+  FiLogOut, FiMenu, FiX, FiCheckSquare, FiLayout, FiUser
 } from 'react-icons/fi'
 
 const Header = () => {
@@ -20,7 +20,6 @@ const Header = () => {
 
   const isActive = (path) => location.pathname === path
 
-  // --- LOGIC-GA KALA SAARISTA NAVIGATION-KA ---
   const menuItems = [
     { icon: FiHome, label: 'Home', path: '/' },
   ]
@@ -32,95 +31,112 @@ const Header = () => {
   if (isAuthenticated && user?.role === 'admin') {
     menuItems.push({ icon: FiUsers, label: 'Providers', path: '/providers' })
     menuItems.push({ icon: FiLayout, label: 'Dashboard', path: '/dashboard' })
+    menuItems.push({ icon: FiCheckSquare, label: 'Admin Bookings', path: '/admin/bookings' })
   }
 
   if (isAuthenticated && user?.role === 'customer') {
-    menuItems.push({ icon: FiCheckSquare, label: 'Bookings', path: '/bookings' })
+    menuItems.push({ icon: FiCheckSquare, label: 'Bookings', path: '/my-bookings' })
   }
 
   return (
-    <header className="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-100 shadow-sm transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-6 py-4">
+    <header className="bg-white/70 backdrop-blur-md sticky top-0 z-50 border-b border-sky-50 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-6 py-3">
         <div className="flex justify-between items-center">
           
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-blue-600 text-white p-2 rounded-xl shadow-lg group-hover:rotate-6 transition-transform">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="bg-sky-500 text-white p-2.5 rounded-2xl shadow-lg shadow-sky-200 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
               <FiHome size={22} />
             </div>
-            <span className="text-lg font-black tracking-tighter text-slate-900">
-              HOME<span className="text-blue-600">Maintenance</span>
-            </span>
+            <div className="flex flex-col">
+               <span className="text-xl font-black tracking-tighter text-slate-900 leading-none">
+                Home<span className="text-sky-500 italic">Maintenance</span>
+              </span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400">Maintenance Pro</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-2 bg-slate-50/50 p-1.5 rounded-[1.5rem] border border-slate-100">
             {menuItems.map((item) => (
               <Link 
                 key={item.path} 
                 to={item.path} 
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                  isActive(item.path) ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-[1.2rem] text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                  isActive(item.path) 
+                  ? 'bg-white text-sky-500 shadow-sm shadow-sky-100' 
+                  : 'text-slate-400 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
-                <item.icon size={14} />
+                <item.icon size={14} className={isActive(item.path) ? 'text-sky-500' : ''} />
                 <span>{item.label}</span>
               </Link>
             ))}
           </nav>
 
-          {/* Auth Buttons: Kaliya REGISTER ayaa muuqda hadda */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Auth & User Profile */}
+          <div className="hidden md:flex items-center gap-5">
             {!isAuthenticated ? (
-              <div className="flex items-center bg-slate-50 p-1 rounded-2xl border border-slate-100">
-                <Link to="/register" className="bg-slate-900 text-white px-8 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md">
-                  Register Now
-                </Link>
-              </div>
+              <Link to="/register" className="group relative bg-slate-900 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] overflow-hidden transition-all hover:bg-sky-500 hover:shadow-xl hover:shadow-sky-100 active:scale-95">
+                <span className="relative z-10">Register Now</span>
+              </Link>
             ) : (
-              /* Marka uu qofku soo galo (Authenticated) */
-              <div className="flex items-center gap-4 pl-4 border-l border-slate-100">
+              <div className="flex items-center gap-4 pl-5 border-l border-slate-100">
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{user?.role}</span>
-                  <span className="text-xs font-black text-slate-900">{user?.name?.split(' ')[0]}</span>
+                  <span className="text-[9px] font-black text-sky-500 uppercase tracking-widest leading-none mb-1">{user?.role}</span>
+                  <span className="text-xs font-black text-slate-900 leading-none">{user?.name?.split(' ')[0]}</span>
                 </div>
-                <button onClick={handleLogout} className="p-2.5 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+                <div className="relative group">
+                   <div className="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-500 border border-sky-100">
+                      <FiUser size={20} />
+                   </div>
+                   {/* Tooltip or Dropdown could go here */}
+                </div>
+                <button 
+                  onClick={handleLogout} 
+                  className="p-2.5 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300"
+                  title="Logout Session"
+                >
                   <FiLogOut size={18} />
                 </button>
               </div>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button className="md:hidden p-2 text-slate-900 bg-slate-50 rounded-xl" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          {/* Mobile Menu Toggle */}
+          <button className="md:hidden p-3 text-slate-900 bg-slate-50 rounded-2xl border border-slate-100" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
         </div>
 
-        {/* Mobile View */}
+        {/* Mobile Sidebar Overlay */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-6 space-y-2">
+          <div className="md:hidden mt-6 pb-8 space-y-3 animate-in fade-in slide-in-from-top-4 duration-300">
             {menuItems.map((item) => (
               <Link 
                 key={item.path} 
                 to={item.path} 
-                className={`flex items-center gap-4 p-4 rounded-2xl font-bold text-sm ${
-                  isActive(item.path) ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-600'
+                className={`flex items-center gap-4 p-5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
+                  isActive(item.path) 
+                  ? 'bg-sky-500 text-white shadow-lg shadow-sky-100' 
+                  : 'bg-slate-50 text-slate-500 border border-slate-100'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <item.icon size={20} />
+                <item.icon size={18} />
                 <span>{item.label}</span>
               </Link>
             ))}
 
             {!isAuthenticated ? (
-              <div className="pt-4 border-t border-slate-100">
-                <Link to="/register" className="flex items-center justify-center p-4 rounded-2xl bg-slate-900 text-white font-bold" onClick={() => setMobileMenuOpen(false)}>Register</Link>
+              <div className="pt-4 space-y-3">
+                <Link to="/register" className="flex items-center justify-center p-5 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-widest" onClick={() => setMobileMenuOpen(false)}>
+                  Create Account
+                </Link>
               </div>
             ) : (
-              <button onClick={handleLogout} className="w-full flex items-center justify-center gap-3 p-4 rounded-2xl bg-rose-50 text-rose-600 font-bold">
-                <FiLogOut /> Logout
+              <button onClick={handleLogout} className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl bg-rose-50 text-rose-600 font-black text-xs uppercase tracking-widest mt-4">
+                <FiLogOut /> Terminate Session
               </button>
             )}
           </div>
