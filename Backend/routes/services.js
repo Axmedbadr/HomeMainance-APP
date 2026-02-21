@@ -9,7 +9,7 @@ import {
   updateService,
   deleteService,
   getServicesByProvider
-} from '../controllers/serviceController.js';
+} from '../Controllers/serviceController.js';
 
 router.post('/', createService);
 router.get('/', getServices);
