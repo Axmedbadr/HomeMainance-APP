@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "npm install && vite build" 
+    "build": "npx vite build"
   },
   "engines": {
     "node": ">=20.0.0"
