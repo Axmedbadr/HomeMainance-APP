@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   // Haddii uu jiro VITE_API_URL (Railway) isticmaal, haddii kale localhost
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5006/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://homemainance-app-production.up.railway.app/api',
 });
 
 api.interceptors.request.use((config) => {
