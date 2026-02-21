@@ -6,7 +6,7 @@ import {
     updateBookingStatus,
     updatePaymentStatus // 1. Hubi inaan lagu soo daray Controller-ka
 } from '../Controllers/controllerBooking.js';
-import { protect, admin } from '../Middleware/auth.js'; 
+import { protect, admin } from '../middleware/auth.js'; 
 
 const router = express.Router();
 

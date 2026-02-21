@@ -6,7 +6,7 @@ import {
     rejectProvider 
 } from '../Controllers/adminController.js';
 import { getAdminDashboardStats } from '../Controllers/controllerBooking.js'; 
-import { protect, admin } from '../Middleware/auth.js';
+import { protect, admin } from '../middleware/auth.js';
 
 const router = express.Router();
 

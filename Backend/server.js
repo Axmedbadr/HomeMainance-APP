@@ -20,8 +20,8 @@ app.use(express.json());
 
 // 2. Database Connection
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ MongoDB Connected!"))
-    .catch((err) => console.error("❌ Database Error:", err));
+    .then(() => console.log(" MongoDB Connected!"))
+    .catch((err) => console.error(" Database Error:", err));
 
 // 3. ISKU XIRKA ROUTES
 app.use('/api/auth', userRoutes);      
@@ -47,5 +47,5 @@ const PORT = process.env.PORT || 5006;
 
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(` Server is running on port ${PORT}`);
 });
