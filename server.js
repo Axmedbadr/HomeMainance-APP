@@ -21,8 +21,12 @@ dotenv.config();
 const app = express();
 
 // Middleware
-// Hubi in cors() uu halkan sare joogo si loo oggolaado XMLHttpRequest
-app.use(cors()); 
+// Waxaan ku darnay 'Origin' si uusan browser-ku u xannibin XMLHttpRequest
+app.use(cors({
+    origin: '*', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+})); 
 app.use(express.json());
 
 // 3. Database Connection
@@ -40,7 +44,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes); 
 
 // 5. Serving Frontend (Static Files)
-// Jidkan 'Frontend/dist' waa midka saxda ah ee Railway uu akhrinayo
+// Jidkan wuxuu aqrinayaa Frontend/dist
 app.use(express.static(path.join(__dirname, 'Frontend/dist'))); 
 
 // 6. Root Route (Handling Frontend Routing)
@@ -48,8 +52,8 @@ app.get('*', (req, res) => {
     const indexPath = path.join(__dirname, 'Frontend', 'dist', 'index.html');
     res.sendFile(indexPath, (err) => {
         if (err) {
-            // Haddii uu khaladkan soo baxo, hubi in 'npm run build' uu guulaystay
-            res.status(500).send("Cillad: Ma la heli karo Frontend Build-ka.");
+            // Haddii uu kan soo baxo, hubi in 'npm run build' uu Railway-ga ku guulaystay
+            res.status(500).send("Cillad: Ma la heli karo Frontend Build-ka. Fadlan hubi dhismaha Railway.");
         }
     });
 });
@@ -66,7 +70,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5006;
 
-// '0.0.0.0' waa muhiim si Railway uu ugu oggolaado xiriirka dibadda
+// '0.0.0.0' waa lagama maarmaan marka la joogo Railway
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
