@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // Haddii uu jiro VITE_API_URL (Railway) isticmaal, haddii kale localhost
-  baseURL: import.meta.env.VITE_API_URL || 'https://homemainance-app-production.up.railway.app/api',
+  // Waxaan ka saarnay qaybtii env-ga si aan u hubinno inuu kan kaliya isticmaalo
+  baseURL: 'https://homemainance-app-production.up.railway.app/api',
 });
 
 api.interceptors.request.use((config) => {
@@ -11,6 +11,8 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 export default api;
