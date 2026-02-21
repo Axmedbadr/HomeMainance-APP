@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Hubi in Port-ku yahay 5006 sidii aan Backend-ka ugu xidhnay
-const API_URL = 'http://localhost:5006/api/reviews';
+const API_URL = 'homemainance-app-production.up.railway.app/api/reviews';
 
 const getByService = async (serviceId) => {
     try {

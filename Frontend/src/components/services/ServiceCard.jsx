@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiArrowRight, FiLock, FiSettings, FiActivity } from 'react-icons/fi';
+import { FiArrowRight, FiLock, FiSettings, FiHome } from 'react-icons/fi'; // Waxaan ku daray FiHome
 import { useAuth } from '../../context/AuthContext'; 
 import toast from 'react-hot-toast';
 
@@ -19,49 +19,51 @@ const ServiceCard = ({ service }) => {
   };
 
   return (
-    <div className="group relative bg-white rounded-[2.5rem] border border-sky-50 shadow-[0_20px_50px_rgba(0,0,0,0.02)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_rgba(14,165,233,0.1)] hover:-translate-y-2">
+    <div className="group relative bg-white rounded-[3rem] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_rgba(14,165,233,0.12)] hover:-translate-y-3 flex flex-col items-center text-center">
       
-      {/* Decorative Accent */}
-      <div className={`absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 rounded-full transition-colors duration-500 ${
-        isAuthenticated ? 'bg-sky-500/5 group-hover:bg-sky-500/10' : 'bg-slate-50'
-      }`}></div>
+      {/* Decorative Accent - Light Blue Circle */}
+      <div className="absolute top-[-10%] right-[-10%] w-48 h-48 bg-sky-50 rounded-full -z-0 group-hover:bg-sky-100/50 transition-colors duration-500"></div>
 
-      <div className="p-10 relative z-10">
-        {/* Category Icon Placeholder */}
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 ${
+      <div className="p-12 relative z-10 w-full flex flex-col items-center">
+        
+        {/* Category Icon - Home Icon Blue Theme */}
+        <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mb-8 shadow-xl transition-all duration-500 ${
           isAuthenticated 
-          ? 'bg-sky-50 text-sky-500 group-hover:bg-sky-500 group-hover:text-white group-hover:rotate-12' 
-          : 'bg-slate-50 text-slate-300'
+          ? 'bg-sky-500 text-white shadow-sky-200 group-hover:rotate-12 group-hover:scale-110' 
+          : 'bg-slate-100 text-slate-400'
         }`}>
-          {isAuthenticated ? <FiActivity size={24} /> : <FiSettings size={24} />}
+          {isAuthenticated ? <FiHome size={32} /> : <FiSettings size={32} />}
         </div>
 
-        <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tighter">
+        {/* Title & Category - Bold & Centered */}
+        <h3 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter leading-tight">
           {service.name}
         </h3>
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-10">
+        <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 mb-12">
           Professional Category
         </p>
         
+        {/* Main Button - Styled like "Verify Portfolio" */}
         <button
           onClick={handlePush}
-          className={`flex items-center justify-between w-full px-8 py-5 rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.3em] transition-all duration-500 group/btn ${
+          className={`flex items-center justify-between w-full px-10 py-6 rounded-[2.5rem] font-black text-[11px] uppercase tracking-[0.3em] transition-all duration-500 group/btn shadow-2xl ${
             isAuthenticated 
-              ? "bg-[#020617] text-white hover:bg-sky-500 shadow-xl shadow-sky-100" 
-              : "bg-slate-50 text-slate-400 border border-dashed border-slate-200 hover:border-sky-200 hover:bg-sky-50/30"
+              ? "bg-[#0077b6] text-white hover:bg-[#023e8a] shadow-sky-200" 
+              : "bg-slate-100 text-slate-400 border border-slate-200"
           }`}
         >
           <span className="relative z-10">
             {isAuthenticated ? "Explore Specialists" : "Access Restricted"}
           </span>
           
-          <div className={`p-2 rounded-xl transition-all duration-500 ${
-            isAuthenticated ? 'bg-white/10 group-hover/btn:bg-white/20' : 'bg-slate-100'
+          {/* Circular Arrow Container */}
+          <div className={`p-3 rounded-full transition-all duration-500 ${
+            isAuthenticated ? 'bg-white/20 group-hover/btn:bg-white/30' : 'bg-slate-200'
           }`}>
             {isAuthenticated ? (
-              <FiArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+              <FiArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
             ) : (
-              <FiLock size={14} className="group-hover:rotate-12 transition-transform" />
+              <FiLock size={16} />
             )}
           </div>
         </button>
