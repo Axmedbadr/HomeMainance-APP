@@ -121,6 +121,7 @@ const Register = () => {
                 <option value="Plumbing">Plumbing</option>
                 <option value="Electrical">Electrical</option>
                 <option value="Cleaning">Cleaning</option>
+                <option value="Cleaning">Painting</option>
               </select>
               <textarea {...register('bio')} placeholder="Brief Bio..." className="w-full p-4 bg-white rounded-2xl font-bold h-24 border-none outline-none shadow-sm resize-none" />
             </div>
