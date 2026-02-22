@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import api from '../services/api'; 
 import toast from 'react-hot-toast';
 
@@ -17,6 +17,14 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
 
+  const logout = useCallback((showToast = true) => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+    if (showToast) toast.success('Si guul leh ayaad ka baxday!');
+  }, []);
+
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
@@ -28,32 +36,34 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
           }
         } catch (error) {
-          console.error("Auth check failed:", error);
-          logout(); 
+          logout(false); 
         }
-      } else {
-        setIsAuthenticated(false);
-        setUser(null);
       }
       setIsLoading(false);
     };
-    
     checkAuth();
-  }, []);
+  }, [logout]);
 
-  // --- KANI WAA QAYBTII KA MAQNAYD (REGISTER) ---
+  // --- REGISTER LOGIC (Kala saarista Provider & Customer) ---
   const register = async (userData) => {
     try {
       const response = await api.post('/users/register', userData);
-      const { token, user: newUser } = response.data;
       
+      // HADDII UU YAHAY PROVIDER: Codsiga waa la kaydiyay laakiin Login ma dhacayo
+      if (userData.role === 'provider') {
+        toast.success('Codsigaaga waa la gudbiyey! Fadlan sug ansixinta Admin-ka.');
+        return { ...response.data, isPendingProvider: true }; 
+      }
+
+      // HADDII UU YAHAY CUSTOMER: Caadi u Login garee
+      const { token, user: newUser } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(newUser));
-      
       setUser(newUser);
       setIsAuthenticated(true);
       toast.success('Diiwaangelintu si guul leh ayay u dhacday!');
       return response.data;
+
     } catch (error) {
       const message = error.response?.data?.message || 'Diiwaangelintu ma suurtagalin';
       toast.error(message);
@@ -65,48 +75,27 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post('/users/login', credentials);
       const { token, user: userData } = response.data;
+
+      // Xannibaad: Provider-ka lama ogola ilaa laga 'approved' gareeyo
+      if (userData.role === 'provider' && userData.status !== 'approved') {
+        toast.error('Koontadaada weli lama ansixin. Fadlan sug Admin-ka.');
+        return null;
+      }
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
-      
       setUser(userData);
       setIsAuthenticated(true);
       toast.success('Si guul leh ayaad u soo gashay!');
       return response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Login-ku ma suurtagalin';
-      toast.error(message);
+      toast.error(error.response?.data?.message || 'Email ama Password waa khalad');
       throw error;
     }
   };
 
-  const updateUser = async (updatedData) => {
-    try {
-      const response = await api.put('/users/profile', updatedData); 
-      const newUserXog = response.data.user;
-      
-      setUser(newUserXog);
-      localStorage.setItem('user', JSON.stringify(newUserXog));
-      toast.success('Profile-ka waa la cusboonaysiiyey!');
-      return newUserXog;
-    } catch (error) {
-      const message = error.response?.data?.message || 'Laguma guulaysan in la beddelo profile-ka';
-      toast.error(message);
-      throw error;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    setIsAuthenticated(false);
-    if (isAuthenticated) toast.success('Si guul leh ayaad ka baxday!');
-  };
-
-  // REGISTER halkan ayaan ku daray si looga helo useAuth()
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, register, updateUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, register }}>
       {!isLoading ? children : (
         <div className="flex items-center justify-center h-screen bg-[#020617]">
           <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
@@ -116,8 +105,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
