@@ -9,7 +9,7 @@ const generateToken = (user) => {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
-// --- 1. GET PROFILE (Saxidda 404 ee Console-ka) ---
+// --- 1. GET PROFILE ---
 router.get('/profile', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -20,7 +20,7 @@ router.get('/profile', protect, async (req, res) => {
   }
 });
 
-// --- 2. UPDATE PROFILE (Saxidda 404 markii xogta la bedelayo) ---
+// --- 2. UPDATE PROFILE ---
 router.put('/profile', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -49,7 +49,33 @@ router.put('/profile', protect, async (req, res) => {
   }
 });
 
-// --- 3. LOGIN ---
+// --- 3. HELITAANKA DHAMAAN KHUBARADA (Waxay saxaysaa 404-ka all-providers) ---
+router.get('/all-providers', async (req, res) => {
+  try {
+    const activeProviders = await Provider.find({ status: 'approved' })
+      .populate('user', 'name phone email')
+      .sort({ updatedAt: -1 });
+    res.status(200).json({ success: true, data: activeProviders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// --- 4. HELITAANKA HAL KHABIIR ---
+router.get('/provider/:id', async (req, res) => {
+  try {
+    let provider = await Provider.findById(req.params.id).populate('user', 'name phone email');
+    if (!provider) {
+      provider = await Provider.findOne({ user: req.params.id }).populate('user', 'name phone email');
+    }
+    if (!provider) return res.status(404).json({ success: false, message: "Khabiirka lama helin!" });
+    res.status(200).json({ success: true, data: provider });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "ID-ga khabiirka maahan mid sax ah." });
+  }
+});
+
+// --- 5. LOGIN ---
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -64,7 +90,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// --- 4. REGISTER ---
+// --- 6. REGISTER ---
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, phone, role } = req.body;
